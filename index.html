@@ -191,7 +191,7 @@ svg{display:block}
 .readonly-banner a:hover{opacity:.85}
 body.readonly{padding-top:56px}
 body.readonly .page{padding-top:24px}
-.legend-modal{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:grid;place-items:center;padding:20px}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite}
 @media (max-width:520px){.page{padding:16px 16px 70px;padding-bottom:calc(70px + env(safe-area-inset-bottom))}body.readonly{padding-top:72px}.avatar-wrap{width:92px;height:92px}.avatar{font-size:26px}.p-bio{font-size:13.5px}.card{padding:26px 20px}.tb-btn span{display:none}.tb-btn{padding:0 10px}.tb-btn.accent{padding:0 14px}.tb-btn.accent span{display:inline}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.reveal{opacity:1!important;transform:none!important}#aurora-canvas{display:none}}
 </style>
@@ -221,10 +221,10 @@ body.readonly .page{padding-top:24px}
     </div>
     <div class="card reveal" style="margin-top:12px">
       <h1 class="card-title">Jouw beveiligde<br>linkpagina.</h1>
-      <p class="card-sub">Alles wat je hier maakt, is <strong>versleuteld</strong>. Deel je kaartje met anderen via een link — zij kunnen alleen kijken, niet aanpassen.</p>
+      <p class="card-sub">Alles wat je hier maakt, is <strong>versleuteld</strong>. Deel je kaartje met een <strong>korte link</strong> — anderen kunnen kijken, niet aanpassen.</p>
       <div class="banner danger" id="cryptoWarning" role="alert"><strong>⚠ Encryptie niet beschikbaar</strong>Open via <code>http://localhost</code> of <code>https://</code>.</div>
       <div class="banner warn" id="storageWarning" role="alert"><strong>⚠ Tijdelijke opslag actief</strong><code>localStorage</code> is geblokkeerd. Je vault werkt alleen in deze sessie.</div>
-      <div class="banner danger" id="shareError" role="alert"><strong>⚠ Deel-link onvolledig</strong>De link is niet volledig aangekomen. Vraag de eigenaar om een nieuwe link te sturen — via WhatsApp of SMS wordt de link soms afgekapt. Plak de link in een adresbalk of gebruik e-mail.</div>
+      <div class="banner danger" id="shareError" role="alert"><strong>⚠ Deel-link onvolledig</strong>De link is niet volledig aangekomen. Vraag de eigenaar om een nieuwe link.</div>
       <div style="display:flex;gap:10px;margin-bottom:24px">
         <button type="button" class="btn accent" style="flex:1" id="btnCreate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nieuwe vault</button>
         <button type="button" class="btn" style="flex:1" id="btnOpen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Bestaande vault</button>
@@ -357,10 +357,10 @@ body.readonly .page{padding-top:24px}
     </div>
     <div class="card" style="margin-bottom:14px">
       <h2 class="card-title" style="font-size:20px">Delen</h2>
-      <p style="font-size:12.5px;color:var(--text-3);line-height:1.7;margin:10px 0 18px">Genereer een link die je kunt delen. Iedereen met de link kan je kaartje bekijken — maar niet aanpassen. <strong>Tip:</strong> deel via e-mail of plak de link direct in de adresbalk. WhatsApp en SMS kunnen de link soms inkorten.</p>
+      <p style="font-size:12.5px;color:var(--text-3);line-height:1.7;margin:10px 0 18px">Genereer een <strong>korte link</strong> die je makkelijk kunt delen via WhatsApp, Instagram of SMS. Iedereen met de link kan je kaartje bekijken — maar niet aanpassen.</p>
       <button type="button" class="btn accent block" id="btnGenerateShare">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M16 6l-4-4-4 4M12 2v14"/></svg>
-        Genereer deel-link
+        Genereer korte deel-link
       </button>
     </div>
     <div class="card">
@@ -387,7 +387,7 @@ body.readonly .page{padding-top:24px}
       <h2>2. Welke gegevens verwerken wij?</h2><p>Wij verwerken <strong>geen</strong> persoonsgegevens op een server. Alle gegevens worden <strong>versleuteld opgeslagen in jouw browser</strong>.</p>
       <h2>3. Hoe beschermen wij je gegevens?</h2>
       <ul><li>Versleuteling met <strong>AES-256-GCM</strong>.</li><li>Sleutelafleiding met <strong>PBKDF2</strong> (310.000 iteraties, SHA-256).</li><li>Je wachtwoord wordt <strong>nooit</strong> opgeslagen.</li><li>Geen server, geen database, geen tracking.</li></ul>
-      <h2>4. Delen</h2><p>Als je een deel-link genereert, worden je gegevens (zonder wachtwoord en zonder profielfoto) gecodeerd in de link zelf. Iedereen met de link kan het kaartje bekijken.</p>
+      <h2>4. Delen</h2><p>Voor het delen gebruiken wij de dienst <strong>is.gd</strong> (een gratis URL-shortener) om een korte link te maken. De eigenlijke data wordt niet naar is.gd verzonden — alleen de URL zelf wordt ingekort. Als je geen gebruik wilt maken van is.gd, kun je altijd de lange link gebruiken (deze bevat alle data).</p>
       <h2>5. Cookies</h2><p>Wij gebruiken <strong>geen tracking-cookies</strong>. Alleen functionele opslag (localStorage).</p>
       <h2>6. Jouw rechten (AVG/GDPR)</h2><ul><li><strong>Inzage:</strong> bekijk je gegevens in de editor.</li><li><strong>Correctie:</strong> pas direct aan.</li><li><strong>Verwijdering:</strong> verwijder je vault.</li><li><strong>Overdraagbaarheid:</strong> exporteer als bestand.</li></ul>
       <h2>7. Contact</h2><p>Voor vragen kun je contact opnemen via de contactgegevens in de footer.</p>
@@ -545,7 +545,76 @@ const VaultCrypto = {
   }
 };
 
-/* ═══ SHARE ENCODING ═══ */
+/* ═══════════════════════════════════════════════════════════════
+   AGRESSIEVE COMPRESSIE — URL verkorten
+   ═══════════════════════════════════════════════════════════════ */
+// Iconen → 1-char codes
+const ICON_CODES = {
+  link:'A', globe:'B', mail:'C', phone:'D', calendar:'E',
+  map:'F', document:'G', download:'H', star:'I', play:'J',
+  mic:'K', cart:'L', user:'M', message:'N', image:'O',
+  code:'P', external:'Q', instagram:'R', x:'S', linkedin:'T',
+  github:'U', youtube:'V', spotify:'W', telegram:'X', tiktok:'Y',
+  twitch:'Z', pinterest:'a', behance:'b', dribbble:'c', facebook:'d',
+  whatsapp:'e'
+};
+const ICON_CODES_REV = {};
+Object.keys(ICON_CODES).forEach(function(k){ ICON_CODES_REV[ICON_CODES[k]] = k; });
+
+// Bekende domeinen → korte codes
+const DOMAIN_CODES = {
+  'instagram.com': '~i',
+  'youtube.com': '~y',
+  'linkedin.com': '~l',
+  'github.com': '~g',
+  'x.com': '~x',
+  'twitter.com': '~t',
+  'tiktok.com': '~k',
+  'facebook.com': '~f',
+  'spotify.com': '~s',
+  'twitch.tv': '~w',
+  'pinterest.com': '~p',
+  'behance.net': '~b',
+  'dribbble.com': '~d',
+  'whatsapp.com': '~a',
+  'telegram.org': '~e',
+  'example.com': '~z'
+};
+const DOMAIN_CODES_REV = {};
+Object.keys(DOMAIN_CODES).forEach(function(k){ DOMAIN_CODES_REV[DOMAIN_CODES[k]] = k; });
+
+function stripProtocol(u){
+  return String(u||'').replace(/^https?:\/\//i, '');
+}
+function addProtocol(u){
+  if(!u) return '#';
+  if(/^(https?:|mailto:|tel:|#)/i.test(u)) return u;
+  return 'https://' + u;
+}
+function compressUrl(u){
+  u = stripProtocol(u);
+  // Check bekende domeinen
+  for(let i=0;i<Object.keys(DOMAIN_CODES).length;i++){
+    const dom = Object.keys(DOMAIN_CODES)[i];
+    if(u === dom) return DOMAIN_CODES[dom];
+    if(u.indexOf(dom + '/') === 0) return DOMAIN_CODES[dom] + u.slice(dom.length);
+  }
+  return u;
+}
+function decompressUrl(u){
+  if(!u) return '#';
+  // Check domain codes
+  if(u.charAt(0) === '~'){
+    for(let i=0;i<Object.keys(DOMAIN_CODES_REV).length;i++){
+      const code = Object.keys(DOMAIN_CODES_REV)[i];
+      if(u.indexOf(code) === 0){
+        return 'https://' + DOMAIN_CODES_REV[code] + u.slice(code.length);
+      }
+    }
+  }
+  return addProtocol(u);
+}
+
 function b64urlEncode(str){
   try {
     return btoa(unescape(encodeURIComponent(str)))
@@ -569,25 +638,29 @@ function encodeShare(data){
       n: (data.profile.name || '').slice(0, 40),
       h: (data.profile.handle || '').slice(0, 30),
       b: (data.profile.bio || '').slice(0, 200),
-      v: data.profile.verified !== false,
-      s: data.profile.status !== false
+      v: data.profile.verified !== false ? 1 : 0,
+      s: data.profile.status !== false ? 1 : 0
     },
     a: {
-      m: data.appearance.mode || 'dark',
+      m: data.appearance.mode === 'light' ? 'l' : 'd',
       c: data.appearance.accent || '#7c5cfc'
     },
-    l: (data.links || []).filter(function(l){ return l.url && l.url !== 'https://'; }).slice(0, 20).map(function(l){
-      return { i: l.icon || 'link', t: (l.title || '').slice(0, 40), s: (l.subtitle || '').slice(0, 50), u: l.url };
+    l: (data.links || []).filter(function(l){ return l.url && l.url !== 'https://'; }).slice(0, 15).map(function(l){
+      return [
+        ICON_CODES[l.icon] || 'A',
+        (l.title || '').slice(0, 40),
+        (l.subtitle || '').slice(0, 50),
+        compressUrl(l.url)
+      ];
     }),
-    s: (data.socials || []).filter(function(s){ return s.url && s.url !== 'https://'; }).slice(0, 20).map(function(s){
-      return { i: s.icon || 'link', u: s.url };
+    s: (data.socials || []).filter(function(s){ return s.url && s.url !== 'https://'; }).slice(0, 15).map(function(s){
+      return [ICON_CODES[s.icon] || 'A', compressUrl(s.url)];
     })
   };
   return b64urlEncode(JSON.stringify(compact));
 }
 
 function decodeShare(encoded){
-  // Strip any non-base64url characters (whitespace, newlines, etc.)
   encoded = String(encoded).replace(/[^A-Za-z0-9_-]/g, '');
   if(!encoded) throw new Error('Lege share data');
   const compact = JSON.parse(b64urlDecode(encoded));
@@ -598,20 +671,49 @@ function decodeShare(encoded){
       handle: compact.p.h || '',
       bio: compact.p.b || '',
       avatar: null,
-      verified: compact.p.v !== false,
-      status: compact.p.s !== false
+      verified: compact.p.v !== 0,
+      status: compact.p.s !== 0
     },
     appearance: {
-      mode: compact.a && compact.a.m ? compact.a.m : 'dark',
+      mode: compact.a && compact.a.m === 'l' ? 'light' : 'dark',
       accent: compact.a && compact.a.c ? compact.a.c : '#7c5cfc'
     },
-    links: (compact.l || []).map(function(l){
-      return { id: uid(), icon: l.i || 'link', title: l.t || '', subtitle: l.s || '', url: l.u || '#' };
+    links: (compact.l || []).map(function(arr){
+      return { id: uid(), icon: ICON_CODES_REV[arr[0]] || 'link', title: arr[1] || '', subtitle: arr[2] || '', url: decompressUrl(arr[3]) };
     }),
-    socials: (compact.s || []).map(function(s){
-      return { id: uid(), icon: s.i || 'link', url: s.u || '#' };
+    socials: (compact.s || []).map(function(arr){
+      return { id: uid(), icon: ICON_CODES_REV[arr[0]] || 'link', url: decompressUrl(arr[1]) };
     })
   };
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   URL SHORTENER — is.gd + v.gd fallback
+   ═══════════════════════════════════════════════════════════════ */
+async function shortenURL(longUrl){
+  const endpoints = [
+    'https://is.gd/create.php?format=simple&url=',
+    'https://v.gd/create.php?format=simple&url='
+  ];
+  for(let i = 0; i < endpoints.length; i++){
+    try {
+      console.log('[LinkVault] Proberen te shorten via', endpoints[i].split('/')[2]);
+      const res = await fetch(endpoints[i] + encodeURIComponent(longUrl), {
+        method: 'GET',
+        headers: { 'Accept': 'text/plain' }
+      });
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const text = (await res.text()).trim();
+      if(text && /^https?:\/\//i.test(text)){
+        console.log('[LinkVault] Short URL:', text);
+        return text;
+      }
+      throw new Error('Onverwacht antwoord: ' + text.slice(0, 50));
+    } catch(e) {
+      console.warn('[LinkVault] Shorten mislukt via', endpoints[i].split('/')[2], ':', e.message);
+    }
+  }
+  return null;
 }
 
 /* ═══ CONSTANTEN ═══ */
@@ -887,29 +989,28 @@ function showFormError(id, msg){
 }
 function hideFormError(id){ const el = $('#' + id); if(el) el.classList.remove('show'); }
 
-/* ═══ SHARE — QUERY STRING (robuuster) ═══ */
-function generateShareURL(){
+/* ═══════════════════════════════════════════════════════════════
+   SHARE — met automatische URL-verkorting
+   ═══════════════════════════════════════════════════════════════ */
+function generateLongURL(){
   if(!state) return null;
   const encoded = encodeShare(state);
-  // BELANGRIJK: gebruik ?v= (query string) ipv #v= (hash)
-  // Query strings overleven WhatsApp, Instagram DM, SMS beter
-  const base = location.origin + location.pathname;
-  return base + '?v=' + encoded;
+  return location.origin + location.pathname + '?v=' + encoded;
 }
 
-function showShareModal(){
-  let url;
+async function showShareModal(){
+  let longUrl;
   try {
-    url = generateShareURL();
+    longUrl = generateLongURL();
   } catch(e) {
     console.error('[LinkVault] Share URL genereren mislukt:', e);
     toast('Kon deel-link niet genereren');
     return;
   }
-  if(!url){ toast('Geen data om te delen'); return; }
+  if(!longUrl){ toast('Geen data om te delen'); return; }
 
-  const urlLength = url.length;
-  const lengthWarning = urlLength > 2000 ? '<p style="font-size:11px;color:var(--warn);margin-top:8px;line-height:1.6">⚠️ Deze link is vrij lang (' + urlLength + ' tekens). Deel hem bij voorkeur via e-mail of plak hem direct in de adresbalk. WhatsApp/SMS kan lange links inkorten.</p>' : '';
+  const urlLength = longUrl.length;
+  const estimatedKb = (urlLength / 1024).toFixed(1);
 
   const modal = document.createElement('div');
   modal.id = 'shareModal';
@@ -917,40 +1018,110 @@ function showShareModal(){
   modal.innerHTML =
     '<div style="width:100%;max-width:520px;background:var(--surface-1);border:1px solid var(--keyline);border-radius:16px;padding:28px;box-shadow:0 40px 100px -40px rgba(0,0,0,.95);margin:auto">' +
       '<h2 style="font-family:\'Inter Tight\',sans-serif;font-size:22px;font-weight:500;letter-spacing:-.045em;margin-bottom:8px">Deel je kaartje</h2>' +
-      '<p style="font-size:12.5px;color:var(--text-2);line-height:1.7;margin-bottom:18px">Kopieer deze link en stuur hem naar wie je maar wilt. Iedereen met de link kan je kaartje <strong>bekijken</strong>, maar <strong>niet aanpassen</strong>.</p>' +
-      '<textarea readonly id="shareUrlField" style="width:100%;padding:14px;border-radius:6px;background:var(--surface-2);border:1px solid var(--keyline);font-size:11px;color:var(--text);font-family:ui-monospace,monospace;resize:none;min-height:100px;outline:none;word-break:break-all;line-height:1.5">' + esc(url) + '</textarea>' +
-      lengthWarning +
-      '<p style="font-size:11px;color:var(--text-3);margin-top:10px;line-height:1.6">ℹ️ Je profielfoto wordt niet meegestuurd in de link. De ontvanger ziet jouw initialen.</p>' +
-      '<div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap">' +
-        '<button type="button" class="btn accent" style="flex:1;min-width:140px" id="shareCopyBtn">Kopieer link</button>' +
-        '<button type="button" class="btn" style="flex:1;min-width:140px" id="shareTestBtn">Test link</button>' +
+      '<p style="font-size:12.5px;color:var(--text-2);line-height:1.7;margin-bottom:18px">We maken automatisch een <strong>korte link</strong> voor je aan via <code style="background:var(--surface-2);padding:1px 5px;border-radius:3px;font-size:11px">is.gd</code>. Iedereen met de link kan je kaartje bekijken, niet aanpassen.</p>' +
+
+      '<div id="shareLoading" style="text-align:center;padding:24px 0">' +
+        '<div class="spinner" style="width:24px;height:24px;border-width:3px;color:var(--violet);margin:0 auto 12px"></div>' +
+        '<p style="font-size:12.5px;color:var(--text-2)">Korte link genereren…</p>' +
       '</div>' +
-      '<button type="button" class="btn ghost block" id="shareCloseBtn" style="margin-top:8px">Sluiten</button>' +
+
+      '<div id="shareResult" style="display:none">' +
+        '<div class="field" style="margin-bottom:12px">' +
+          '<label style="display:flex;justify-content:space-between;align-items:center"><span>Korte link</span><span id="shortUrlBadge" style="font-size:9.5px;color:var(--success);text-transform:none;letter-spacing:0">✓ Klaar</span></label>' +
+          '<textarea readonly id="shortUrlField" style="width:100%;padding:14px;border-radius:6px;background:var(--surface-2);border:1px solid var(--violet-line);font-size:14px;color:var(--text);font-family:ui-monospace,monospace;resize:none;min-height:56px;outline:none;word-break:break-all;line-height:1.5"></textarea>' +
+        '</div>' +
+        '<button type="button" class="btn accent block" id="shareCopyShortBtn" style="margin-bottom:16px">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+          'Kopieer korte link' +
+        '</button>' +
+
+        '<details style="margin-bottom:16px">' +
+          '<summary style="cursor:pointer;font-size:11.5px;color:var(--text-3);padding:6px 0;user-select:none">Lange link (altijd backup — ' + estimatedKb + ' KB)</summary>' +
+          '<p style="font-size:11px;color:var(--text-3);margin-top:6px;line-height:1.5">Als de korte link niet werkt, kun je deze lange link gebruiken. Alle data zit erin.</p>' +
+          '<textarea readonly id="longUrlField" style="width:100%;padding:12px;border-radius:6px;background:var(--surface-2);border:1px solid var(--keyline);font-size:10.5px;color:var(--text);font-family:ui-monospace,monospace;resize:none;min-height:80px;outline:none;word-break:break-all;line-height:1.4;margin-top:6px"></textarea>' +
+          '<button type="button" class="btn sm block" id="shareCopyLongBtn" style="margin-top:6px">Kopieer lange link</button>' +
+        '</details>' +
+
+        '<p style="font-size:11px;color:var(--text-3);margin-top:6px;line-height:1.6">ℹ️ Je profielfoto wordt niet meegestuurd. De ontvanger ziet jouw initialen.</p>' +
+      '</div>' +
+
+      '<div id="shareErrorBox" style="display:none">' +
+        '<div style="padding:14px;border-radius:6px;background:rgba(229,165,10,.07);border:1px solid rgba(229,165,10,.25);color:#e5a50a;font-size:12.5px;line-height:1.6;margin-bottom:16px">' +
+          '<strong style="display:block;margin-bottom:4px">Korte link mislukt</strong>' +
+          'De URL-shortener is tijdelijk niet bereikbaar. Gebruik de lange link hieronder — die werkt altijd.' +
+        '</div>' +
+        '<div class="field" style="margin-bottom:12px">' +
+          '<label>Lange link</label>' +
+          '<textarea readonly id="longUrlFieldErr" style="width:100%;padding:14px;border-radius:6px;background:var(--surface-2);border:1px solid var(--keyline);font-size:10.5px;color:var(--text);font-family:ui-monospace,monospace;resize:none;min-height:100px;outline:none;word-break:break-all;line-height:1.4"></textarea>' +
+        '</div>' +
+        '<button type="button" class="btn accent block" id="shareCopyLongErrBtn">Kopieer lange link</button>' +
+      '</div>' +
+
+      '<button type="button" class="btn ghost block" id="shareCloseBtn" style="margin-top:16px">Sluiten</button>' +
     '</div>';
   document.body.appendChild(modal);
 
-  setTimeout(function(){
-    const field = $('#shareUrlField');
-    if(field){ field.focus(); field.select(); }
-  }, 100);
-
   function closeModal(){ modal.remove(); }
 
-  $('#shareCopyBtn').addEventListener('click', async function(){
-    try{
-      await navigator.clipboard.writeText(url);
-      toast('Link gekopieerd ✓');
-      closeModal();
-    }catch(e){
-      const field = $('#shareUrlField');
-      if(field){ field.select(); document.execCommand('copy'); toast('Link gekopieerd'); closeModal(); }
-      else { toast('Kopiëren mislukt — selecteer handmatig'); }
-    }
-  });
+  function setTextAndSelect(id, text){
+    const f = $('#' + id);
+    if(f){ f.value = text; f.focus(); f.select(); }
+  }
 
-  $('#shareTestBtn').addEventListener('click', function(){
-    window.open(url, '_blank', 'noopener,noreferrer');
-  });
+  async function copyText(text, successMsg){
+    try {
+      await navigator.clipboard.writeText(text);
+      toast(successMsg);
+      return true;
+    } catch(e) {
+      // Fallback
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed'; ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        toast(successMsg);
+        return true;
+      } catch(e2) {
+        toast('Kopiëren mislukt — selecteer handmatig');
+        return false;
+      }
+    }
+  }
+
+  // Probeer korte link te genereren
+  try {
+    const shortUrl = await shortenURL(longUrl);
+    if(shortUrl){
+      $('#shareLoading').style.display = 'none';
+      $('#shareResult').style.display = 'block';
+      setTextAndSelect('shortUrlField', shortUrl);
+      // ook lange link invullen
+      const longField = $('#longUrlField');
+      if(longField) longField.value = longUrl;
+
+      $('#shareCopyShortBtn').addEventListener('click', function(){
+        copyText(shortUrl, 'Korte link gekopieerd ✓').then(function(ok){ if(ok) closeModal(); });
+      });
+      $('#shareCopyLongBtn').addEventListener('click', function(){
+        copyText(longUrl, 'Lange link gekopieerd ✓');
+      });
+    } else {
+      throw new Error('Geen short URL');
+    }
+  } catch(e) {
+    console.warn('[LinkVault] Shorten definitief mislukt:', e);
+    $('#shareLoading').style.display = 'none';
+    $('#shareErrorBox').style.display = 'block';
+    const errField = $('#longUrlFieldErr');
+    if(errField) errField.value = longUrl;
+    $('#shareCopyLongErrBtn').addEventListener('click', function(){
+      copyText(longUrl, 'Lange link gekopieerd ✓').then(function(ok){ if(ok) closeModal(); });
+    });
+  }
 
   $('#shareCloseBtn').addEventListener('click', closeModal);
   modal.addEventListener('click', function(e){ if(e.target === modal) closeModal(); });
@@ -972,7 +1143,6 @@ function applyReadOnlyMode(){
   if(ownBtn){
     ownBtn.addEventListener('click', function(e){
       e.preventDefault();
-      // Verwijder query string en herlaad
       window.location.href = location.origin + location.pathname;
     });
   }
@@ -996,21 +1166,26 @@ function applyReadOnlyMode(){
   console.log('[LinkVault] Read-only modus actief');
 }
 
-/* ═══ SHARE DATA LEZEN — ROBUUST ═══ */
+/* ═══ SHARE DATA LEZEN ═══ */
 function readShareFromURL(){
-  // Check query string eerst (?v=), dan hash (#v=)
   let encoded = null;
   let source = null;
 
-  // Query string
+  // Query string (?v=)
   const search = location.search || '';
   if(search){
-    const params = new URLSearchParams(search);
-    const v = params.get('v');
-    if(v && v.length > 0){ encoded = v; source = 'query'; }
+    try {
+      const params = new URLSearchParams(search);
+      const v = params.get('v');
+      if(v && v.length > 0){ encoded = v; source = 'query'; }
+    } catch(e) {
+      // Fallback voor oude browsers
+      const m = search.match(/[?&]v=([^&]+)/);
+      if(m && m[1]){ encoded = decodeURIComponent(m[1]); source = 'query'; }
+    }
   }
 
-  // Fallback: hash
+  // Fallback: hash (#v=)
   if(!encoded && location.hash){
     const m = location.hash.match(/^#v=(.+)$/);
     if(m && m[1]){ encoded = m[1]; source = 'hash'; }
@@ -1018,9 +1193,7 @@ function readShareFromURL(){
 
   if(!encoded) return null;
 
-  // Sanitize
   encoded = encoded.replace(/[^A-Za-z0-9_-]/g, '');
-
   if(encoded.length < 10){
     console.warn('[LinkVault] Share data te kort (' + encoded.length + ' chars) — bron: ' + source);
     return { error: 'tooshort' };
@@ -1392,7 +1565,6 @@ function runDiagnose(){
   const val = function(v){ return '<span>' + v + '</span>'; };
   rows.push('<div class="diag-row"><span>Modus</span>' + val(readOnlyMode ? 'Read-only (deel-link)' : 'Eigenaar') + '</div>');
   rows.push('<div class="diag-row"><span>Protocol</span>' + val(location.protocol) + '</div>');
-  rows.push('<div class="diag-row"><span>URL lengte</span>' + val(location.href.length + ' tekens') + '</div>');
   const shareCheck = readShareFromURL();
   rows.push('<div class="diag-row"><span>Share data</span>' + val(shareCheck ? (shareCheck.data ? 'gevonden via ' + shareCheck.source : 'fout: ' + shareCheck.error) : 'geen') + '</div>');
   rows.push('<div class="diag-row"><span>crypto.subtle</span>' + ok(!!(window.crypto && window.crypto.subtle)) + '</div>');
@@ -1527,10 +1699,7 @@ function checkEnvironment(){
 (function init(){
   console.log('[LinkVault] Init — persistent:', SafeStorage.isPersistent(), '— crypto:', VaultCrypto.available());
   console.log('[LinkVault] URL:', location.href);
-  console.log('[LinkVault] Search:', location.search);
-  console.log('[LinkVault] Hash:', location.hash);
 
-  // Check of er een share-link in de URL staat
   const shareCheck = readShareFromURL();
   if(shareCheck){
     if(shareCheck.data){
@@ -1547,10 +1716,8 @@ function checkEnvironment(){
         $('#shareError').classList.add('show');
       }
     } else {
-      // Er was share data maar decode faalde
       console.warn('[LinkVault] Share data gevonden maar decode faalde:', shareCheck);
       $('#shareError').classList.add('show');
-      // Toon welcome view
       applyTheme();
       renderVaultList();
       checkEnvironment();
@@ -1559,7 +1726,6 @@ function checkEnvironment(){
     }
   }
 
-  // Normale flow
   applyTheme();
   renderVaultList();
   initCookies();

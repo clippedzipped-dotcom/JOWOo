@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="nl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#08080a">
+<title>LinkVault — Jouw beveiligde links</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   UNICORN STUDIO DESIGN SYSTEM
+   Near-black void · violet aurora · aggressive negative tracking
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  --void:#08080a;
+  --surface-1:#0d0d12;
+  --surface-2:#17171c;
+  --surface-3:#25252d;
+  --keyline:#31313a;
+  --text:#e8e8ec;
+  --text-2:#8a8a96;
+  --text-3:#4a4a56;
+  --violet:#7c5cfc;
+  --violet-soft:rgba(124,92,252,.12);
+  --violet-line:rgba(124,92,252,.35);
+  --violet-glow:rgba(124,92,252,.25);
+  --cream:#f0ece4;
+  --danger:#e5484d;
+  --success:#30a46c;
+  --warn:#e5a50a;
+  --r-micro:3px;
+  --r-sm:6px;
+  --r-md:10px;
+  --r-lg:16px;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--void);color:var(--text);
+  min-height:100svh;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  -webkit-tap-highlight-color:transparent;
+  letter-spacing:-0.01em;font-size:16px;line-height:1.4;
+  transition:background .6s var(--ease),color .6s var(--ease);
+}
+[data-theme="light"]{
+  --void:#f2f1ed;--surface-1:#fff;--surface-2:#f7f6f2;--surface-3:#eeede8;
+  --keyline:#d9d7d0;--text:#12121a;--text-2:#5c5c66;--text-3:#9a9aa4;
+  --cream:#12121a;--violet-soft:rgba(124,92,252,.08);--violet-line:rgba(124,92,252,.3);
+}
+button,input,textarea,select{font:inherit;color:inherit;letter-spacing:inherit}
+button{background:none;border:none;cursor:pointer}
+a{color:inherit;text-decoration:none}
+svg{display:block}
+::selection{background:var(--violet);color:#fff}
+:focus-visible{outline:2px solid var(--violet);outline-offset:3px;border-radius:var(--r-micro)}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--keyline);border-radius:99px}
+
+.skip-link{position:absolute;top:-60px;left:16px;z-index:999;padding:10px 18px;border-radius:0 0 var(--r-sm) var(--r-sm);background:var(--cream);color:var(--void);font-weight:600;font-size:14px;transition:top .3s var(--ease)}
+.skip-link:focus{top:0}
+
+/* ═══ INTERACTIEVE ACHTERGROND — CANVAS AURORA ═══ */
+#aurora-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity 1.2s var(--ease)}
+#aurora-canvas.ready{opacity:1}
+.bg-fallback{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg-void{position:absolute;inset:0;background:var(--void)}
+.orb{position:absolute;border-radius:50%;filter:blur(140px);will-change:transform;opacity:.35;transition:opacity .8s}
+.orb-a{width:700px;height:700px;top:-320px;left:-240px;background:radial-gradient(circle,#7c5cfc,transparent 62%);animation:drift1 26s ease-in-out infinite}
+.orb-b{width:600px;height:600px;bottom:-300px;right:-220px;background:radial-gradient(circle,#a855f7,transparent 62%);opacity:.22;animation:drift2 32s ease-in-out infinite}
+.orb-c{width:460px;height:460px;top:40%;left:58%;background:radial-gradient(circle,#ec4899,transparent 62%);opacity:.12;animation:drift3 38s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(120px,90px) scale(1.2)}}
+@keyframes drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-100px,-80px) scale(1.15)}}
+@keyframes drift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-90px,100px) scale(.82)}}
+
+/* ═══ LAYOUT ═══ */
+.page{position:relative;z-index:1;width:100%;max-width:520px;margin:0 auto;padding:20px 20px 90px;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+.view{display:none}
+.view.active{display:block}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease-out),transform .9s var(--ease-out)}
+.reveal.in-view{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.08s}
+.reveal-delay-2{transition-delay:.16s}
+.reveal-delay-3{transition-delay:.24s}
+.reveal-delay-4{transition-delay:.32s}
+
+/* ═══ CARDS — SMOKED GLASS ═══ */
+.card{
+  background:color-mix(in srgb,var(--surface-1) 78%,transparent);
+  border:1px solid var(--keyline);border-radius:var(--r-lg);
+  padding:32px 26px;backdrop-filter:blur(28px) saturate(150%);
+  -webkit-backdrop-filter:blur(28px) saturate(150%);
+  box-shadow:0 1px 0 0 rgba(255,255,255,.03) inset, 0 24px 80px -40px rgba(0,0,0,.9);
+  position:relative;overflow:hidden;
+  transition:border-color .4s var(--ease),box-shadow .4s var(--ease);
+}
+.card:hover{border-color:color-mix(in srgb,var(--keyline) 60%,var(--violet-line));box-shadow:0 1px 0 0 rgba(255,255,255,.03) inset, 0 24px 80px -40px rgba(0,0,0,.9), 0 0 80px -30px var(--violet-glow)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--violet-line),transparent);opacity:.6}
+.card-title{
+  font-family:'Inter Tight','Inter',sans-serif;
+  font-size:clamp(28px,5.5vw,38px);font-weight:500;
+  letter-spacing:-0.055em;line-height:1.02;margin-bottom:10px;color:var(--text);
+}
+.card-sub{font-size:13.5px;color:var(--text-2);line-height:1.65;margin-bottom:28px;letter-spacing:-0.008em}
+
+/* ═══ BANNERS ═══ */
+.banner{padding:14px 16px;border-radius:var(--r-sm);font-size:12.5px;line-height:1.6;margin-bottom:16px;display:none;border:1px solid transparent}
+.banner.warn{background:rgba(229,165,10,.07);border-color:rgba(229,165,10,.25);color:#e5a50a}
+.banner.danger{background:rgba(229,72,77,.07);border-color:rgba(229,72,77,.25);color:#e5484d}
+.banner.show{display:block}
+.banner strong{display:block;margin-bottom:4px;font-weight:600;letter-spacing:-0.015em}
+.banner code{background:rgba(0,0,0,.3);padding:2px 6px;border-radius:3px;font-size:11px;font-family:ui-monospace,monospace;letter-spacing:0}
+[data-theme="light"] .banner code{background:rgba(0,0,0,.05)}
+
+/* ═══ FORMULIER ═══ */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--text-3);margin-bottom:8px;letter-spacing:0.06em;text-transform:uppercase}
+.input,.textarea{
+  width:100%;padding:14px 16px;border-radius:var(--r-sm);
+  background:var(--surface-2);border:1px solid var(--keyline);
+  font-size:14.5px;line-height:1.5;color:var(--text);outline:none;
+  letter-spacing:-0.008em;
+  transition:border-color .25s var(--ease),background .25s,box-shadow .25s;
+}
+.input::placeholder,.textarea::placeholder{color:var(--text-3)}
+.input:hover,.textarea:hover{border-color:color-mix(in srgb,var(--keyline) 70%,var(--text-3))}
+.input:focus,.textarea:focus{border-color:var(--violet);background:var(--surface-1);box-shadow:0 0 0 3px var(--violet-soft), 0 0 40px -20px var(--violet-glow)}
+.textarea{resize:vertical;min-height:92px;font-family:inherit}
+.char-count{font-size:10.5px;color:var(--text-3);text-align:right;margin-top:6px;font-variant-numeric:tabular-nums}
+.hint{font-size:11.5px;color:var(--text-3);margin-top:8px;line-height:1.55;letter-spacing:-0.005em}
+
+.pw-strength{display:flex;gap:4px;margin-top:10px}
+.pw-strength span{height:3px;flex:1;border-radius:99px;background:var(--surface-3);transition:background .3s}
+.pw-strength span.on{background:var(--success)}
+.pw-strength span.med{background:var(--warn)}
+.pw-strength span.weak{background:var(--danger)}
+
+.check-row{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:var(--r-sm);background:var(--surface-2);border:1px solid var(--keyline);margin-bottom:18px}
+.check-row input[type="checkbox"]{width:18px;height:18px;flex-shrink:0;margin-top:2px;accent-color:var(--violet);cursor:pointer;border-radius:3px}
+.check-row label{font-size:12.5px;color:var(--text-2);line-height:1.6;cursor:pointer;letter-spacing:-0.005em}
+.check-row a{color:var(--violet);border-bottom:1px solid var(--violet-line);padding-bottom:1px;transition:border-color .2s}
+.check-row a:hover{border-color:var(--violet)}
+
+.form-error{display:none;padding:14px 16px;border-radius:var(--r-sm);background:rgba(229,72,77,.07);border:1px solid rgba(229,72,77,.3);color:#e5484d;font-size:13px;line-height:1.5;margin-bottom:16px;font-weight:500;letter-spacing:-0.005em}
+.form-error.show{display:block;animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ═══ KNOPPEN ═══ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  height:48px;padding:0 24px;border-radius:var(--r-micro);
+  font-size:13.5px;font-weight:600;letter-spacing:-0.015em;
+  border:1px solid var(--keyline);background:transparent;color:var(--text);
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:transform .25s var(--ease),background .25s,border-color .25s,color .25s,box-shadow .35s;
+}
+.btn svg{width:16px;height:16px}
+.btn:hover{background:var(--surface-2);border-color:var(--text-3)}
+.btn:active{transform:scale(.97)}
+.btn.accent{
+  background:var(--cream);color:var(--void);border-color:var(--cream);font-weight:600;
+  box-shadow:0 0 0 0 var(--violet-glow);
+}
+.btn.accent:hover{background:#fff;border-color:#fff;box-shadow:0 0 60px -12px var(--violet-glow)}
+[data-theme="light"] .btn.accent{background:#12121a;color:#fff;border-color:#12121a}
+[data-theme="light"] .btn.accent:hover{background:#000;border-color:#000}
+.btn.danger{color:var(--danger);border-color:rgba(229,72,77,.25)}
+.btn.danger:hover{background:rgba(229,72,77,.07);border-color:var(--danger)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--text-2)}
+.btn.ghost:hover{background:var(--surface-2);color:var(--text)}
+.btn.block{width:100%}
+.btn.sm{height:42px;font-size:12.5px;padding:0 18px}
+.btn:disabled{opacity:.4;pointer-events:none}
+
+/* ═══ TOPBAR ═══ */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 0 24px;margin-bottom:4px;
+  background:linear-gradient(to bottom,var(--void) 55%,transparent);
+}
+.brand{display:flex;align-items:center;gap:11px;font-size:14px;font-weight:600;letter-spacing:-0.025em}
+.brand-icon{
+  width:32px;height:32px;border-radius:var(--r-micro);
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--violet),#a855f7);
+  color:#fff;box-shadow:0 0 32px -8px var(--violet-glow);
+  transition:transform .4s var(--ease),box-shadow .4s;
+}
+.brand:hover .brand-icon{transform:scale(1.08);box-shadow:0 0 48px -8px var(--violet-glow)}
+.brand-icon svg{width:15px;height:15px}
+.top-actions{display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.tb-btn{
+  display:flex;align-items:center;gap:7px;height:38px;padding:0 13px;
+  border-radius:var(--r-micro);font-size:12.5px;font-weight:500;color:var(--text-2);
+  border:1px solid transparent;letter-spacing:-0.008em;
+  transition:background .25s,color .25s,transform .25s var(--ease),border-color .25s;
+}
+.tb-btn svg{width:15px;height:15px}
+.tb-btn:hover{background:var(--surface-2);color:var(--text)}
+.tb-btn:active{transform:scale(.95)}
+.tb-btn.accent{background:var(--cream);color:var(--void);font-weight:600;border-color:var(--cream)}
+.tb-btn.accent:hover{background:#fff;border-color:#fff}
+[data-theme="light"] .tb-btn.accent{background:#12121a;color:#fff;border-color:#12121a}
+.sun-icon,.moon-icon{display:none}
+[data-theme="dark"] .sun-icon{display:block}
+[data-theme="light"] .moon-icon{display:block}
+
+/* ═══ PROFIEL ═══ */
+.profile{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:36px}
+.avatar-wrap{position:relative;width:108px;height:108px;margin-bottom:22px}
+.avatar-ring{
+  position:absolute;inset:0;border-radius:50%;padding:2px;
+  background:conic-gradient(from 150deg,var(--violet),#a855f7,#ec4899,var(--violet));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask-composite:exclude;animation:spin 14s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.avatar{
+  position:absolute;inset:7px;border-radius:50%;overflow:hidden;
+  background:linear-gradient(150deg,var(--surface-3),var(--surface-1));
+  display:grid;place-items:center;
+  font-family:'Inter Tight',sans-serif;font-size:30px;font-weight:500;letter-spacing:-0.06em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 12px 40px -16px rgba(0,0,0,.9);
+}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.avatar-glow{
+  position:absolute;inset:-24px;border-radius:50%;z-index:-1;
+  background:radial-gradient(circle,var(--violet-glow),transparent 70%);
+  filter:blur(24px);animation:breathe 5s ease-in-out infinite;
+}
+@keyframes breathe{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.85;transform:scale(1.14)}}
+.status-dot{position:absolute;bottom:6px;right:6px;width:18px;height:18px;border-radius:50%;background:var(--success);border:3px solid var(--void);z-index:2}
+.status-dot[hidden]{display:none}
+.p-name{
+  font-family:'Inter Tight',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:clamp(30px,6vw,38px);font-weight:500;letter-spacing:-0.058em;line-height:1.05;
+  margin-bottom:8px;color:var(--text);
+}
+.verified{width:20px;height:20px;flex-shrink:0}
+.verified[hidden]{display:none}
+.p-handle{font-size:13.5px;font-weight:500;color:var(--violet);margin-bottom:18px;letter-spacing:-0.012em}
+.p-handle:empty{display:none}
+.p-bio{
+  font-size:14.5px;line-height:1.68;color:var(--text-2);
+  max-width:380px;margin-bottom:26px;white-space:pre-wrap;letter-spacing:-0.006em;
+}
+.p-bio:empty{display:none}
+.socials{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:4px}
+.socials:empty{display:none}
+.social{
+  width:44px;height:44px;display:grid;place-items:center;
+  border-radius:var(--r-micro);border:1px solid var(--keyline);
+  background:var(--surface-1);color:var(--text-2);
+  transition:transform .35s var(--ease),color .25s,background .25s,border-color .25s,box-shadow .4s;
+}
+.social svg{width:18px;height:18px}
+.social:hover{color:var(--text);background:var(--surface-2);border-color:var(--violet-line);transform:translateY(-4px);box-shadow:0 12px 32px -16px var(--violet-glow)}
+.social:active{transform:translateY(-1px) scale(.94)}
+
+/* ═══ LINKS — CINEMATIC CARDS ═══ */
+.links{display:flex;flex-direction:column;gap:10px;margin-bottom:36px}
+.link-card{
+  position:relative;display:flex;align-items:center;gap:15px;
+  padding:18px 20px;border-radius:var(--r-sm);
+  border:1px solid var(--keyline);
+  background:color-mix(in srgb,var(--surface-1) 65%,transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  overflow:hidden;isolation:isolate;
+  transition:transform .4s var(--ease),background .35s,border-color .35s,box-shadow .45s;
+  will-change:transform;
+}
+.link-card::before{
+  content:'';position:absolute;top:0;left:-130%;width:65%;height:100%;z-index:2;
+  background:linear-gradient(100deg,transparent,rgba(124,92,252,.07),transparent);
+  transition:left .85s var(--ease);pointer-events:none;
+}
+.link-card:hover{
+  background:var(--surface-2);border-color:var(--violet-line);
+  transform:translateY(-3px);
+  box-shadow:0 16px 48px -24px var(--violet-glow), 0 1px 0 0 rgba(255,255,255,.03) inset;
+}
+.link-card:hover::before{left:155%}
+.link-card:active{transform:translateY(-1px) scale(.99)}
+.link-icon{
+  width:44px;height:44px;flex-shrink:0;display:grid;place-items:center;
+  border-radius:var(--r-micro);background:var(--violet-soft);color:var(--violet);
+  transition:transform .4s var(--ease),background .3s;
+}
+.link-icon svg{width:20px;height:20px}
+.link-card:hover .link-icon{transform:scale(1.1);background:rgba(124,92,252,.2)}
+.link-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.link-text strong{font-size:14px;font-weight:600;letter-spacing:-0.025em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.link-text small{font-size:12px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-0.006em}
+.link-arrow{width:16px;height:16px;flex-shrink:0;color:var(--text-3);opacity:.5;transition:transform .4s var(--ease),opacity .3s,color .3s}
+.link-card:hover .link-arrow{transform:translateX(5px);opacity:1;color:var(--violet)}
+
+/* ═══ FOOTER ═══ */
+.footer{text-align:center;font-size:11.5px;color:var(--text-3);line-height:2;letter-spacing:-0.005em}
+.footer a{color:var(--text-2);border-bottom:1px solid transparent;transition:border-color .25s,color .25s}
+.footer a:hover{color:var(--text);border-color:var(--violet-line)}
+.footer .legal-links{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;margin-bottom:14px}
+.biz-details{font-size:11px;color:var(--text-3);line-height:1.9;margin-top:14px;padding-top:14px;border-top:1px solid var(--keyline);letter-spacing:-0.003em}
+
+/* ═══ TOAST ═══ */
+.toast{
+  position:fixed;left:50%;bottom:28px;z-index:200;
+  display:flex;align-items:center;gap:10px;padding:14px 24px;border-radius:99px;
+  background:var(--cream);color:var(--void);
+  font-size:12.5px;font-weight:600;white-space:nowrap;letter-spacing:-0.008em;
+  box-shadow:0 24px 70px -24px rgba(0,0,0,.9), 0 0 50px -14px var(--violet-glow);
+  transform:translate(-50%,90px);opacity:0;
+  transition:transform .55s var(--ease-out),opacity .45s;pointer-events:none;
+  bottom:calc(28px + env(safe-area-inset-bottom));max-width:calc(100vw - 40px);
+}
+[data-theme="light"] .toast{background:#12121a;color:#fff}
+.toast.show{transform:translate(-50%,0);opacity:1}
+.toast svg{width:14px;height:14px;flex-shrink:0}
+.toast span{overflow:hidden;text-overflow:ellipsis}
+
+/* ═══ LEGAL PAGES ═══ */
+.legal-page{display:none}
+.legal-page.active{display:block}
+.legal-page h1{font-family:'Inter Tight',sans-serif;font-size:clamp(28px,5vw,36px);font-weight:500;letter-spacing:-0.055em;line-height:1.05;margin-bottom:10px}
+.legal-page .updated{font-size:11px;color:var(--text-3);margin-bottom:30px;letter-spacing:0.06em;text-transform:uppercase}
+.legal-page h2{font-size:17px;font-weight:600;letter-spacing:-0.03em;margin:28px 0 12px;color:var(--text)}
+.legal-page p,.legal-page li{font-size:13.5px;line-height:1.75;color:var(--text-2);margin-bottom:10px;letter-spacing:-0.006em}
+.legal-page ul{margin:8px 0 14px 20px}
+.legal-page li{margin-bottom:6px}
+.back-link{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--violet);margin-bottom:24px;transition:gap .25s;letter-spacing:-0.012em;border-bottom:1px solid var(--violet-line);padding-bottom:2px}
+.back-link:hover{gap:12px}
+.back-link svg{width:14px;height:14px}
+
+#viewLegal{position:fixed;inset:0;z-index:120;background:var(--void);overflow-y:auto;padding:28px 20px;display:none}
+#viewLegal.active{display:block}
+
+/* ═══ COOKIE BANNER ═══ */
+.cookie-banner{
+  position:fixed;left:50%;bottom:20px;z-index:150;
+  transform:translateX(-50%) translateY(150%);
+  width:calc(100% - 32px);max-width:520px;
+  background:color-mix(in srgb,var(--surface-1) 92%,transparent);
+  border:1px solid var(--keyline);border-radius:var(--r-lg);padding:22px;
+  backdrop-filter:blur(28px) saturate(150%);-webkit-backdrop-filter:blur(28px) saturate(150%);
+  box-shadow:0 24px 70px -24px rgba(0,0,0,.9), 0 0 70px -36px var(--violet-glow);
+  transition:transform .65s var(--ease-out);
+  bottom:calc(20px + env(safe-area-inset-bottom));
+}
+.cookie-banner.show{transform:translateX(-50%) translateY(0)}
+.cookie-banner p{font-size:12.5px;line-height:1.65;color:var(--text-2);margin-bottom:16px;letter-spacing:-0.006em}
+.cookie-banner p a{color:var(--violet);border-bottom:1px solid var(--violet-line);padding-bottom:1px}
+.cookie-actions{display:flex;gap:8px}
+.cookie-actions .btn{flex:1;height:44px;font-size:12.5px}
+
+/* ═══ DIAGNOSE ═══ */
+.diag{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:none;place-items:center;padding:20px}
+.diag.show{display:grid}
+.diag-box{width:100%;max-width:500px;max-height:80vh;overflow-y:auto;background:var(--surface-1);border:1px solid var(--keyline);border-radius:var(--r-lg);padding:28px;box-shadow:0 40px 100px -40px rgba(0,0,0,.95), 0 0 100px -50px var(--violet-glow)}
+.diag-box h2{font-family:'Inter Tight',sans-serif;font-size:20px;font-weight:500;letter-spacing:-0.045em;margin-bottom:18px}
+.diag-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--keyline);font-size:12.5px}
+.diag-row:last-of-type{border-bottom:none}
+.diag-row span:first-child{color:var(--text-2)}
+.diag-row span:last-child{font-family:ui-monospace,monospace;font-weight:600;text-align:right;word-break:break-all;letter-spacing:0}
+.diag-ok{color:var(--success)}
+.diag-fail{color:var(--danger)}
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width:520px){
+  .page{padding:16px 16px 70px;padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+  .avatar-wrap{width:92px;height:92px}
+  .avatar{font-size:26px}
+  .p-bio{font-size:13.5px}
+  .card{padding:26px 20px}
+  .tb-btn span{display:none}
+  .tb-btn{padding:0 10px}
+  .tb-btn.accent{padding:0 14px}
+  .tb-btn.accent span{display:inline}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .reveal{opacity:1!important;transform:none!important}
+  #aurora-canvas{display:none}
+}
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Direct naar inhoud</a>
+
+<!-- ═══ INTERACTIEVE AURORA ACHTERGROND ═══ -->
+<canvas id="aurora-canvas" aria-hidden="true"></canvas>
+<div class="bg-fallback" aria-hidden="true">
+  <div class="bg-void"></div>
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="orb orb-c"></div>
+</div>
+
+<main class="page" id="main-content">
+
+  <!-- ═══ WELCOME ═══ -->
+  <section class="view active" id="viewWelcome">
+    <div class="topbar">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </span>
+        LinkVault
+      </div>
+      <div class="top-actions">
+        <button type="button" class="tb-btn" id="diagBtn" aria-label="Diagnose" title="Diagnose">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+        </button>
+        <button type="button" class="tb-btn" id="themeToggleWelcome" aria-label="Thema wisselen">
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="card reveal" style="margin-top:12px">
+      <h1 class="card-title">Jouw beveiligde<br>linkpagina.</h1>
+      <p class="card-sub">
+        Alles wat je hier maakt, is <strong>versleuteld</strong> en alleen zichtbaar voor jou.
+        Niemand anders kan je gegevens zien — ook wij niet.
+      </p>
+
+      <div class="banner danger" id="cryptoWarning" role="alert">
+        <strong>⚠ Encryptie niet beschikbaar</strong>
+        Je opent deze pagina in een sandbox of via <code>file://</code>. Moderne browsers blokkeren dan de versleuteling. Open de pagina via <code>http://localhost</code> of <code>https://</code>. Klik rechtsboven op <strong>Diagnose</strong> voor hulp.
+      </div>
+
+      <div class="banner warn" id="storageWarning" role="alert">
+        <strong>⚠ Tijdelijke opslag actief</strong>
+        <code>localStorage</code> is geblokkeerd (sandbox of privémodus). Je vault werkt nu <strong>alleen in deze sessie</strong>. Bij herladen of sluiten ben je alles kwijt. Exporteer je vault als back-up of open de pagina via <code>https://</code> om permanent op te slaan.
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:24px">
+        <button type="button" class="btn accent" style="flex:1" id="btnCreate">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Nieuwe vault
+        </button>
+        <button type="button" class="btn" style="flex:1" id="btnOpen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Bestaande vault
+        </button>
+      </div>
+
+      <div id="createForm" style="display:none">
+        <div class="form-error" id="createError" role="alert"></div>
+        <div class="field">
+          <label for="newName">Jouw naam</label>
+          <input class="input" id="newName" placeholder="Bijv. Jan Jansen" maxlength="40" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="newPw">Kies een wachtwoord</label>
+          <input class="input" id="newPw" type="password" placeholder="Minimaal 8 tekens" autocomplete="new-password">
+          <div class="pw-strength" id="pwStrength" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+          <p class="hint">Dit wachtwoord versleutelt al je gegevens. Bewaar het goed — het kan niet worden hersteld.</p>
+        </div>
+        <div class="field">
+          <label for="newPw2">Herhaal wachtwoord</label>
+          <input class="input" id="newPw2" type="password" placeholder="Herhaal je wachtwoord" autocomplete="new-password">
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="consentCheck">
+          <label for="consentCheck">
+            Ik ga akkoord met de <a href="#" data-legal="privacy">privacyverklaring</a> en de
+            <a href="#" data-legal="terms">algemene voorwaarden</a>. Ik begrijp dat mijn gegevens
+            versleuteld en lokaal worden opgeslagen.
+          </label>
+        </div>
+        <button type="button" class="btn accent block" id="btnCreateSubmit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Vault aanmaken
+        </button>
+        <button type="button" class="btn ghost block" id="cancelCreate" style="margin-top:8px">Annuleren</button>
+      </div>
+
+      <div id="openForm" style="display:none">
+        <div class="form-error" id="openError" role="alert"></div>
+        <div class="field">
+          <label for="openPw">Wachtwoord</label>
+          <input class="input" id="openPw" type="password" placeholder="Voer je wachtwoord in" autocomplete="current-password">
+          <p class="hint">Voer het wachtwoord in dat je bij het aanmaken hebt gekozen.</p>
+        </div>
+        <button type="button" class="btn accent block" id="btnOpenSubmit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Ontgrendelen
+        </button>
+        <button type="button" class="btn ghost block" id="cancelOpen" style="margin-top:8px">Annuleren</button>
+      </div>
+
+      <div id="vaultList" style="display:none"></div>
+    </div>
+
+    <div style="text-align:center;margin-top:28px;font-size:11px;color:var(--text-3);line-height:2">
+      <div class="legal-links" style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px">
+        <a href="#" data-legal="privacy" style="color:var(--text-2);border-bottom:1px solid transparent;transition:border-color .25s">Privacy</a>
+        <a href="#" data-legal="terms" style="color:var(--text-2);border-bottom:1px solid transparent;transition:border-color .25s">Voorwaarden</a>
+        <a href="#" data-legal="cookies" style="color:var(--text-2);border-bottom:1px solid transparent;transition:border-color .25s">Cookies</a>
+        <a href="#" data-legal="refund" style="color:var(--text-2);border-bottom:1px solid transparent;transition:border-color .25s">Terugbetaling</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PROFIEL ═══ -->
+  <section class="view" id="viewProfile">
+    <div class="topbar">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </span>
+        LinkVault
+      </div>
+      <div class="top-actions">
+        <button type="button" class="tb-btn" id="themeToggleProfile" aria-label="Thema wisselen">
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+        <button type="button" class="tb-btn" id="btnShareProfile" aria-label="Delen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M16 6l-4-4-4 4M12 2v14"/></svg>
+          <span>Delen</span>
+        </button>
+        <button type="button" class="tb-btn" id="btnLock" aria-label="Vergrendelen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>Vergrendel</span>
+        </button>
+        <button type="button" class="tb-btn accent" id="btnEdit" aria-label="Bewerken">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+          <span>Bewerken</span>
+        </button>
+      </div>
+    </div>
+
+    <header class="profile">
+      <div class="avatar-wrap reveal">
+        <div class="avatar-glow"></div>
+        <div class="avatar-ring"></div>
+        <div class="avatar" id="avatar" aria-label="Profielfoto">?</div>
+        <div class="status-dot" id="statusDot" aria-label="Beschikbaar"></div>
+      </div>
+      <h1 class="p-name reveal reveal-delay-1">
+        <span id="nameText">Laden…</span>
+        <svg class="verified" id="verifiedBadge" viewBox="0 0 24 24" aria-label="Geverifieerd">
+          <circle cx="12" cy="12" r="10" fill="#3b82f6"/>
+          <path d="M8 12.5l2.6 2.6L16.2 9.5" stroke="#fff" stroke-width="2.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </h1>
+      <p class="p-handle reveal reveal-delay-2" id="handleText"></p>
+      <p class="p-bio reveal reveal-delay-2" id="bioText"></p>
+      <nav class="socials reveal reveal-delay-3" id="socials" aria-label="Social media"></nav>
+    </header>
+
+    <section class="links" id="links" aria-label="Links"></section>
+
+    <footer class="footer reveal">
+      <div class="legal-links">
+        <a href="#" data-legal="privacy">Privacy</a>
+        <a href="#" data-legal="terms">Voorwaarden</a>
+        <a href="#" data-legal="cookies">Cookies</a>
+        <a href="#" data-legal="refund">Terugbetaling</a>
+      </div>
+      <div>© <span id="footerYear"></span> <strong id="footerName"></strong></div>
+      <div class="biz-details" id="bizDetails">
+        KvK: 12345678 · BTW: NL001234567B01<br>
+        Adres: Voorbeeldstraat 1, 1234 AB Amsterdam<br>
+        Contact: info@voorbeeld.nl
+      </div>
+    </footer>
+  </section>
+
+  <!-- ═══ EDITOR ═══ -->
+  <section class="view" id="viewEditor">
+    <div class="topbar">
+      <div class="brand">
+        <button type="button" class="tb-btn" id="btnBackToProfile" aria-label="Terug naar profiel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        Bewerken
+      </div>
+      <div class="top-actions">
+        <span id="saveState" style="font-size:11.5px;color:var(--text-3);display:flex;align-items:center;gap:7px" role="status">
+          <span style="width:5px;height:5px;border-radius:50%;background:var(--success);display:inline-block"></span>
+          Opgeslagen
+        </span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <h2 class="card-title" style="font-size:20px;margin-bottom:0">Profiel</h2>
+      <div style="display:flex;align-items:center;gap:16px;margin:20px 0">
+        <div class="avatar" style="position:relative;inset:auto;width:64px;height:64px;font-size:18px" id="edAvatarPreview">?</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn sm" id="btnUploadAvatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+            Upload
+          </button>
+          <button type="button" class="btn sm ghost" id="btnRemoveAvatar">Verwijder</button>
+          <input type="file" id="avatarFile" accept="image/*" hidden>
+        </div>
+      </div>
+      <div class="field"><label for="edName">Naam</label><input class="input" id="edName" maxlength="40" placeholder="Jouw naam"></div>
+      <div class="field"><label for="edHandle">Gebruikersnaam</label><input class="input" id="edHandle" maxlength="30" placeholder="@jouwnaam"></div>
+      <div class="field">
+        <label for="edBio">Bio</label>
+        <textarea class="textarea" id="edBio" maxlength="180" placeholder="Vertel kort wie je bent…"></textarea>
+        <div class="char-count"><span id="edBioCount">0</span>/180</div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-top:1px solid var(--keyline)">
+        <div><strong style="font-size:13px;display:block;margin-bottom:2px;letter-spacing:-0.015em">Geverifieerd</strong><span style="font-size:11.5px;color:var(--text-3)">Toon een blauw vinkje</span></div>
+        <button type="button" class="switch" id="tgVerified" role="switch" aria-checked="true" aria-label="Geverifieerd" style="position:relative;width:44px;height:24px;border-radius:99px;background:var(--violet);border:1px solid var(--violet);transition:background .3s">
+          <span style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .35s var(--ease);transform:translateX(20px)"></span>
+        </button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-top:1px solid var(--keyline)">
+        <div><strong style="font-size:13px;display:block;margin-bottom:2px;letter-spacing:-0.015em">Beschikbaar</strong><span style="font-size:11.5px;color:var(--text-3)">Groene status-indicator</span></div>
+        <button type="button" class="switch" id="tgStatus" role="switch" aria-checked="true" aria-label="Beschikbaar" style="position:relative;width:44px;height:24px;border-radius:99px;background:var(--violet);border:1px solid var(--violet);transition:background .3s">
+          <span style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .35s var(--ease);transform:translateX(20px)"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+        <h2 class="card-title" style="font-size:20px;margin:0">Links</h2>
+        <span style="font-size:11.5px;color:var(--text-3)" id="linkCount">0</span>
+      </div>
+      <div id="edLinks" style="display:flex;flex-direction:column;gap:8px"></div>
+      <button type="button" class="btn block sm" id="btnAddLink" style="margin-top:12px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Link toevoegen
+      </button>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+        <h2 class="card-title" style="font-size:20px;margin:0">Socials</h2>
+        <span style="font-size:11.5px;color:var(--text-3)" id="socialCount">0</span>
+      </div>
+      <div id="edSocials" style="display:flex;flex-direction:column;gap:8px"></div>
+      <button type="button" class="btn block sm" id="btnAddSocial" style="margin-top:12px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Social toevoegen
+      </button>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <h2 class="card-title" style="font-size:20px">Weergave</h2>
+      <div class="field" style="margin-top:18px">
+        <label>Thema</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--surface-2);border:1px solid var(--keyline);border-radius:var(--r-micro)" id="modeSwitch">
+          <button type="button" data-mode="dark" style="height:38px;border-radius:3px;font-size:12.5px;font-weight:600;color:var(--text-2);transition:.25s">Donker</button>
+          <button type="button" data-mode="light" style="height:38px;border-radius:3px;font-size:12.5px;font-weight:600;color:var(--text-2);transition:.25s">Licht</button>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Accentkleur</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px" id="swatches"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title" style="font-size:20px">Gegevens</h2>
+      <p style="font-size:12.5px;color:var(--text-3);line-height:1.7;margin:10px 0 20px;letter-spacing:-0.006em">
+        Je gegevens worden <strong>versleuteld</strong> opgeslagen in je browser. Maak regelmatig een back-up door te exporteren.
+      </p>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <button type="button" class="btn sm" id="btnExport" style="flex:1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7.5 10.5L12 15l4.5-4.5M4 20h16"/></svg>
+          Export
+        </button>
+        <button type="button" class="btn sm" id="btnImport" style="flex:1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7.5 7.5L12 3l4.5 4.5M4 20h16"/></svg>
+          Import
+        </button>
+        <input type="file" id="importFile" accept=".vault,.json,application/json" hidden>
+      </div>
+      <button type="button" class="btn sm danger block" id="btnDeleteVault">Vault verwijderen</button>
+    </div>
+
+    <div style="text-align:center;margin-top:32px">
+      <button type="button" class="btn ghost sm" id="btnLockEditor">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Vergrendelen
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══ LEGAL ═══ -->
+<div id="viewLegal" role="region" aria-label="Juridische informatie">
+  <div style="max-width:640px;margin:0 auto">
+    <a href="#" class="back-link" id="legalBack">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Terug
+    </a>
+
+    <div class="legal-page" id="legal-privacy">
+      <h1>Privacyverklaring</h1>
+      <p class="updated">Laatst bijgewerkt: 1 januari 2026</p>
+      <h2>1. Wie zijn wij?</h2>
+      <p>LinkVault is een gratis webapplicatie waarmee je een persoonlijke linkpagina kunt maken. Je gegevens blijven lokaal in je browser en worden nooit naar een server verzonden.</p>
+      <h2>2. Welke gegevens verwerken wij?</h2>
+      <p>Wij verwerken <strong>geen</strong> persoonsgegevens op een server. Alle gegevens die je invoert worden <strong>versleuteld opgeslagen in jouw browser</strong> (localStorage). Wij hebben geen toegang tot deze gegevens.</p>
+      <h2>3. Hoe beschermen wij je gegevens?</h2>
+      <ul>
+        <li>Versleuteling met <strong>AES-256-GCM</strong>.</li>
+        <li>Sleutelafleiding met <strong>PBKDF2</strong> (310.000 iteraties, SHA-256).</li>
+        <li>Je wachtwoord wordt <strong>nooit</strong> opgeslagen of verzonden.</li>
+        <li>Geen server, geen database, geen tracking.</li>
+      </ul>
+      <h2>4. Cookies</h2>
+      <p>Wij gebruiken <strong>geen tracking-cookies</strong>. Alleen functionele opslag (localStorage). Hiervoor is geen toestemming vereist (Telecommunicatiewet art. 11.7a lid 2).</p>
+      <h2>5. Jouw rechten (AVG/GDPR)</h2>
+      <ul>
+        <li><strong>Inzage:</strong> bekijk je gegevens in de editor.</li>
+        <li><strong>Correctie:</strong> pas direct aan in de editor.</li>
+        <li><strong>Verwijdering:</strong> verwijder je vault.</li>
+        <li><strong>Overdraagbaarheid:</strong> exporteer als bestand.</li>
+      </ul>
+      <h2>6. Contact</h2>
+      <p>Voor vragen kun je contact opnemen via de contactgegevens in de footer.</p>
+    </div>
+
+    <div class="legal-page" id="legal-terms">
+      <h1>Algemene voorwaarden</h1>
+      <p class="updated">Laatst bijgewerkt: 1 januari 2026</p>
+      <h2>1. Toepasselijkheid</h2>
+      <p>Deze voorwaarden zijn van toepassing op het gebruik van LinkVault.</p>
+      <h2>2. Gebruik van de dienst</h2>
+      <ul>
+        <li>LinkVault is een gratis tool voor persoonlijk gebruik.</li>
+        <li>Je bent zelf verantwoordelijk voor de inhoud die je plaatst.</li>
+        <li>Je mag geen illegale, aanstootgevende of inbreukmakende content plaatsen.</li>
+        <li>Je bent zelf verantwoordelijk voor het bewaren van je wachtwoord.</li>
+      </ul>
+      <h2>3. Aansprakelijkheid</h2>
+      <p>LinkVault wordt geleverd "as is". Wij zijn niet aansprakelijk voor verlies van gegevens, schade of enige andere vorm van schade. Maak altijd een back-up via de exportfunctie.</p>
+      <h2>4. Intellectueel eigendom</h2>
+      <p>Alle rechten op de LinkVault-applicatie berusten bij de maker. De inhoud die jij invoert, blijft jouw eigendom.</p>
+      <h2>5. Wijzigingen</h2>
+      <p>Wij behouden ons het recht voor deze voorwaarden te wijzigen. Wijzigingen worden op deze pagina gepubliceerd.</p>
+      <h2>6. Toepasselijk recht</h2>
+      <p>Op deze voorwaarden is Nederlands recht van toepassing.</p>
+    </div>
+
+    <div class="legal-page" id="legal-cookies">
+      <h1>Cookiebeleid</h1>
+      <p class="updated">Laatst bijgewerkt: 1 januari 2026</p>
+      <h2>1. Wat zijn cookies?</h2>
+      <p>Cookies zijn kleine tekstbestanden die op je apparaat worden opgeslagen. LinkVault gebruikt <strong>geen cookies</strong>.</p>
+      <h2>2. Welke opslag gebruiken wij?</h2>
+      <p>LinkVault gebruikt <strong>localStorage</strong> — functionele opslag die noodzakelijk is voor de werking.</p>
+      <ul>
+        <li><strong>Functionele opslag:</strong> je versleutelde vault en thema-voorkeur.</li>
+        <li><strong>Geen tracking:</strong> geen analytische, advertentie- of sociale cookies.</li>
+        <li><strong>Geen third-party:</strong> geen externe scripts, iframes of widgets.</li>
+      </ul>
+      <h2>3. Toestemming</h2>
+      <p>Omdat wij alleen strikt noodzakelijke functionele opslag gebruiken, is er onder de Telecommunicatiewet (art. 11.7a lid 2) <strong>geen toestemming vereist</strong>. Wij tonen toch een cookiemelding voor transparantie.</p>
+      <h2>4. Wijzigingen</h2>
+      <p>Als wij in de toekomst andere opslag gaan gebruiken, zullen wij hiervoor vooraf toestemming vragen via een cookiebanner.</p>
+    </div>
+
+    <div class="legal-page" id="legal-refund">
+      <h1>Retour- en terugbetalingsbeleid</h1>
+      <p class="updated">Laatst bijgewerkt: 1 januari 2026</p>
+      <h2>1. Gratis dienst</h2>
+      <p>LinkVault is een <strong>gratis</strong> dienst. Er worden geen betalingen gevraagd en er zijn geen abonnementen.</p>
+      <h2>2. Geen terugbetalingen</h2>
+      <p>Omdat de dienst gratis is, zijn terugbetalingen niet van toepassing.</p>
+      <h2>3. Toekomstige betaalde functies</h2>
+      <p>Mocht LinkVault in de toekomst betaalde functies aanbieden, dan zal hiervoor een apart retourbeleid worden opgesteld dat voldoet aan de wettelijke eisen (14 dagen bedenktijd voor consumenten).</p>
+      <h2>4. Contact</h2>
+      <p>Voor vragen kun je contact opnemen via de contactgegevens in de footer.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ COOKIE BANNER ═══ -->
+<div class="cookie-banner" id="cookieBanner" role="dialog" aria-label="Cookiemelding">
+  <p>LinkVault gebruikt alleen <strong>functionele opslag</strong> die noodzakelijk is voor de werking. Geen tracking, geen analytics, geen advertenties. <a href="#" data-legal="cookies">Meer informatie</a></p>
+  <div class="cookie-actions">
+    <button type="button" class="btn accent" id="cookieAccept">Begrepen</button>
+    <button type="button" class="btn" id="cookieReject">Alleen noodzakelijk</button>
+  </div>
+</div>
+
+<!-- ═══ DIAGNOSE ═══ -->
+<div class="diag" id="diagModal" role="dialog" aria-label="Diagnose">
+  <div class="diag-box">
+    <h2>Diagnose</h2>
+    <div id="diagContent"></div>
+    <div style="display:flex;gap:8px;margin-top:22px">
+      <button type="button" class="btn accent block" id="diagClose">Sluiten</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOAST ═══ -->
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+  <span id="toastText">Opgeslagen</span>
+</div>
+
+<script>
+'use strict';
+console.log('[LinkVault] Script start');
+
+/* ═══════════════════════════════════════════════════════════════
+   VEILIGE OPSLAG — met automatische fallback naar geheugen
+   ═══════════════════════════════════════════════════════════════ */
+const SafeStorage = (function(){
+  const memory = {};
+  let usingMemory = false;
+  let available = false;
+  try{
+    const testKey = '__lv_test__';
+    window.localStorage.setItem(testKey, '1');
+    window.localStorage.removeItem(testKey);
+    available = true;
+  }catch(e){
+    console.warn('[LinkVault] localStorage geblokkeerd, val terug op geheugenopslag:', e.message);
+    available = false;
+    usingMemory = true;
+  }
+  function getItem(key){
+    if(available){
+      try{ return window.localStorage.getItem(key); }
+      catch(e){ usingMemory = true; available = false; }
+    }
+    return Object.prototype.hasOwnProperty.call(memory, key) ? memory[key] : null;
+  }
+  function setItem(key, val){
+    if(available){
+      try{ window.localStorage.setItem(key, val); return true; }
+      catch(e){ usingMemory = true; available = false; }
+    }
+    memory[key] = String(val);
+    return true;
+  }
+  function removeItem(key){
+    if(available){
+      try{ window.localStorage.removeItem(key); return; }
+      catch(e){ usingMemory = true; available = false; }
+    }
+    delete memory[key];
+  }
+  return { getItem, setItem, removeItem, isPersistent(){ return available; }, isMemoryFallback(){ return usingMemory; } };
+})();
+
+/* ═══════════════════════════════════════════════════════════════
+   ICONEN
+   ═══════════════════════════════════════════════════════════════ */
+const ICONS = {
+  link:'<path d="M10 13.5a4 4 0 0 0 5.7 0l2.8-2.8a4 4 0 0 0-5.7-5.7l-1.4 1.4"/><path d="M14 10.5a4 4 0 0 0-5.7 0l-2.8 2.8a4 4 0 0 0 5.7 5.7l1.4-1.4"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.7 3.9 5.9 3.9 9s-1.4 6.3-3.9 9c-2.5-2.7-3.9-5.9-3.9-9S9.5 5.7 12 3z"/>',
+  mail:'<rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M3 7.5l9 5.5 9-5.5"/>',
+  phone:'<path d="M6.5 3h-2A1.5 1.5 0 0 0 3 4.6C3 13 11 21 19.4 21a1.5 1.5 0 0 0 1.6-1.5v-2a1.5 1.5 0 0 0-1.2-1.5l-2.6-.5a1.5 1.5 0 0 0-1.5.6l-.9 1.2a13 13 0 0 1-5.6-5.6l1.2-.9a1.5 1.5 0 0 0 .6-1.5l-.5-2.6A1.5 1.5 0 0 0 6.5 3z"/>',
+  calendar:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  map:'<path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+  document:'<path d="M13 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9z"/><path d="M13 3v6h6M9 13h6M9 17h4"/>',
+  download:'<path d="M12 3v12M7.5 10.5L12 15l4.5-4.5M4 20h16"/>',
+  star:'<path d="M12 3.5l2.6 5.4 5.9.9-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.2 5.9-.9z"/>',
+  play:'<circle cx="12" cy="12" r="9"/><path d="M10 8.7l5.5 3.3-5.5 3.3z" fill="currentColor" stroke="none"/>',
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3"/>',
+  cart:'<circle cx="9.5" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3.5h2.2l2.3 11.2a1.8 1.8 0 0 0 1.8 1.4h8.4a1.8 1.8 0 0 0 1.8-1.4L20.5 7H5.5"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  message:'<path d="M20.5 12c0 4.4-3.8 8-8.5 8a9.6 9.6 0 0 1-3-.5L4 21l1.6-4A7.7 7.7 0 0 1 3.5 12c0-4.4 3.8-8 8.5-8s8.5 3.6 8.5 8z"/>',
+  image:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M3.5 17l4.5-4.5 3.5 3.5 3-3 6 6"/>',
+  code:'<path d="M9 7l-5 5 5 5M15 7l5 5-5 5"/>',
+  external:'<path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/>',
+  instagram:'<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/>',
+  x:'<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor" stroke="none"/>',
+  linkedin:'<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7.5 10.5V17"/><circle cx="7.5" cy="7.6" r="1" fill="currentColor" stroke="none"/><path d="M11.5 17v-3.6a2.4 2.4 0 0 1 4.8 0V17"/>',
+  github:'<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>',
+  youtube:'<rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="M10.3 9.4l5 2.6-5 2.6z" fill="currentColor" stroke="none"/>',
+  spotify:'<circle cx="12" cy="12" r="9"/><path d="M7.3 9.4c3.2-1 6.9-.8 9.6.8M8 12.4c2.6-.8 5.5-.6 7.8.7M8.6 15.3c2-.6 4.3-.4 6.1.6"/>',
+  telegram:'<path d="M21.5 3.5L2.8 11c-.9.4-.8 1.6.1 1.8l4.6 1.3 1.7 5.1c.2.7 1.2.8 1.6.2l2.5-3.3 4.7 3.5c.6.5 1.5.1 1.7-.6l3-13.4c.2-.9-.7-1.6-1.2-1.1z"/><path d="M7.5 14.1L21 4.5"/>',
+  tiktok:'<path d="M15.2 3.5v10.9a4.3 4.3 0 1 1-4.3-4.3"/><path d="M15.2 3.5c.3 2.4 2.1 4.2 4.6 4.4"/>',
+  twitch:'<path d="M4 3.5h16v10.2l-3.8 3.8h-3.4l-2.6 2.5H8v-2.5H4z"/><path d="M11 8v4M15.5 8v4"/>',
+  pinterest:'<circle cx="12" cy="12" r="9"/><path d="M10.2 20.5L12 13M9.7 11.2c0-1.9 1.5-3.4 3.5-3.4s3.4 1.3 3.4 3.2c0 2.2-1.2 3.7-2.9 3.7-.9 0-1.6-.5-1.8-1.3"/>',
+  behance:'<path d="M2.5 7h4.3a2.4 2.4 0 0 1 0 4.8H2.5zM2.5 11.8h4.8a2.4 2.4 0 0 1 0 4.8H2.5z"/><path d="M14 14.4h6.8a3.4 3.4 0 1 0-6.8 0 3.4 3.4 0 0 0 3.4 3.4c1.1 0 2-.4 2.7-1.2"/>',
+  dribbble:'<circle cx="12" cy="12" r="9"/><path d="M5.2 6.5c3.6 3.2 8.6 4.6 13.4 3.6M3.4 13.6c4.3-1.2 8.5.4 10.7 4.8M8.6 3.6c3 3.9 4.4 8.8 4 13.8"/>',
+  facebook:'<path d="M15 3h-2.5A4.5 4.5 0 0 0 8 7.5V10H5.5v3.5H8V21h3.5v-7.5h2.7l.6-3.5h-3.3V7.8a1.3 1.3 0 0 1 1.3-1.3H15z"/>',
+  whatsapp:'<path d="M3.5 20.5l1.3-4A8 8 0 1 1 12 20a8 8 0 0 1-3.9-1z"/><path d="M9.2 9c0 3 2.4 5.4 5.4 5.4.6 0 1-.5 1-1l-1.4-1-1 .7a4.7 4.7 0 0 1-2.2-2.2l.7-1L10.7 8c-.5 0-1 .4-1 1z"/>'
+};
+const ICON_KEYS = Object.keys(ICONS);
+function iconSVG(name){
+  const d = ICONS[name] || ICONS.link;
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CRYPTO — AES-256-GCM + PBKDF2
+   ═══════════════════════════════════════════════════════════════ */
+const VaultCrypto = {
+  available(){ return !!(window.crypto && window.crypto.subtle); },
+  async deriveKey(password, salt){
+    const enc = new TextEncoder();
+    const km = await window.crypto.subtle.importKey('raw', enc.encode(password), {name:'PBKDF2'}, false, ['deriveKey']);
+    return window.crypto.subtle.deriveKey(
+      {name:'PBKDF2', salt, iterations:310000, hash:'SHA-256'},
+      km, {name:'AES-GCM', length:256}, false, ['encrypt','decrypt']
+    );
+  },
+  async encrypt(data, password){
+    const enc = new TextEncoder();
+    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+    const iv   = window.crypto.getRandomValues(new Uint8Array(12));
+    const key  = await this.deriveKey(password, salt);
+    const ct   = await window.crypto.subtle.encrypt({name:'AES-GCM', iv}, key, enc.encode(JSON.stringify(data)));
+    const b64 = u8 => btoa(String.fromCharCode.apply(null, u8));
+    return { v:1, salt:b64(salt), iv:b64(iv), ct:b64(new Uint8Array(ct)) };
+  },
+  async decrypt(payload, password){
+    const dec = new TextDecoder();
+    const b64d = s => Uint8Array.from(atob(s), c=>c.charCodeAt(0));
+    const key = await this.deriveKey(password, b64d(payload.salt));
+    const pt = await window.crypto.subtle.decrypt({name:'AES-GCM', iv:b64d(payload.iv)}, key, b64d(payload.ct));
+    return JSON.parse(dec.decode(pt));
+  }
+};
+
+/* ═══ CONSTANTEN ═══ */
+const KEY_VAULT  = 'linkvault.vault';
+const KEY_THEME  = 'linkvault.theme';
+const KEY_COOKIE = 'linkvault.cookieAck';
+const LOCK_TIMEOUT = 15 * 60 * 1000;
+
+let state = null;
+let vaultPw = null;
+let lockTimer = null;
+
+/* ═══ HELPERS ═══ */
+const uid = () => Math.random().toString(36).slice(2,9);
+const $  = (s,ctx) => (ctx||document).querySelector(s);
+const $$ = (s,ctx) => Array.from((ctx||document).querySelectorAll(s));
+const esc = str => String(str==null?'':str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function initialsFrom(name){
+  return (String(name||'').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()) || '?';
+}
+function normalizeUrl(u){
+  u = String(u||'').trim();
+  if(!u) return '#';
+  if(/^(https?:|mailto:|tel:|\/|#)/i.test(u)) return u;
+  return 'https://' + u;
+}
+function prettyUrl(u){ return String(u||'').replace(/^https?:\/\//,'').replace(/\/$/,''); }
+
+let toastTimer;
+function toast(msg){
+  const t = $('#toastText'); if(t) t.textContent = msg;
+  const el = $('#toast'); if(!el) return;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 2600);
+}
+
+function defaultData(){
+  return {
+    profile:{ name:'Jouw Naam', handle:'@jouwnaam', bio:'Product Designer & Developer.\nIk bouw snelle, strakke digitale ervaringen.', avatar:null, verified:true, status:true },
+    appearance:{ mode:'dark', accent:'#7c5cfc' },
+    links:[
+      {id:uid(), icon:'globe',     title:'Mijn Portfolio', subtitle:'Bekijk mijn nieuwste werk', url:'https://example.com'},
+      {id:uid(), icon:'instagram', title:'Instagram',      subtitle:'@jouwnaam', url:'https://instagram.com'},
+      {id:uid(), icon:'mail',      title:'Neem contact op',subtitle:'hallo@jouwnaam.nl', url:'mailto:hallo@jouwnaam.nl'}
+    ],
+    socials:[
+      {id:uid(), icon:'instagram', url:'https://instagram.com'},
+      {id:uid(), icon:'x',         url:'https://x.com'},
+      {id:uid(), icon:'linkedin',  url:'https://linkedin.com'}
+    ]
+  };
+}
+
+/* ═══ THEMA ═══ */
+function applyTheme(){
+  const mode = (state && state.appearance && state.appearance.mode) || SafeStorage.getItem(KEY_THEME) || 'dark';
+  const accent = (state && state.appearance && state.appearance.accent) || '#7c5cfc';
+  document.documentElement.setAttribute('data-theme', mode);
+  document.documentElement.style.setProperty('--accent', accent);
+  const meta = $('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content', mode === 'dark' ? '#08080a' : '#f2f1ed');
+}
+
+/* ═══ VIEWS ═══ */
+function showView(id){
+  $$('.view').forEach(v => v.classList.remove('active'));
+  const el = $('#' + id);
+  if(el) el.classList.add('active');
+  window.scrollTo({top:0, behavior:'auto'});
+  // Trigger reveal animations voor de nieuwe view
+  setTimeout(observeReveals, 50);
+}
+
+/* ═══ INTERACTIEVE AURORA SHADER ═══ */
+(function initAurora(){
+  const canvas = document.getElementById('aurora-canvas');
+  if(!canvas || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const gl = canvas.getContext('webgl', {alpha:true, antialias:false, premultipliedAlpha:false});
+  if(!gl){ console.warn('[LinkVault] WebGL niet beschikbaar, fallback actief'); return; }
+
+  const vs = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }`;
+  const fs = `
+    precision mediump float;
+    uniform vec2 u_res;
+    uniform vec2 u_mouse;
+    uniform float u_time;
+
+    float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+    float noise(vec2 p){
+      vec2 i = floor(p); vec2 f = fract(p);
+      f = f*f*(3.0-2.0*f);
+      return mix(mix(hash(i), hash(i+vec2(1.0,0.0)), f.x),
+                 mix(hash(i+vec2(0.0,1.0)), hash(i+vec2(1.0,1.0)), f.x), f.y);
+    }
+    float fbm(vec2 p){
+      float v = 0.0; float a = 0.5;
+      for(int i=0;i<5;i++){ v += a*noise(p); p *= 2.0; a *= 0.5; }
+      return v;
+    }
+
+    void main(){
+      vec2 uv = gl_FragCoord.xy / u_res;
+      vec2 p = (gl_FragCoord.xy - 0.5*u_res) / min(u_res.x, u_res.y);
+      vec2 m = (u_mouse - 0.5*u_res) / min(u_res.x, u_res.y);
+
+      float t = u_time * 0.08;
+      vec2 q = p * 1.6;
+
+      // Aurora flows
+      float f1 = fbm(q + vec2(t, -t*0.6));
+      float f2 = fbm(q*1.4 + vec2(-t*0.8, t*0.5) + f1);
+      float f3 = fbm(q*2.1 + vec2(t*0.4, -t*0.9) + f2*0.5);
+
+      // Mouse invloed — lokale helderheid rond cursor
+      float md = length(p - m*0.6);
+      float mouseGlow = exp(-md * 2.2) * 0.55;
+
+      // Violet palette
+      vec3 c1 = vec3(0.486, 0.361, 0.988); // #7c5cfc
+      vec3 c2 = vec3(0.659, 0.333, 0.969); // #a855f7
+      vec3 c3 = vec3(0.925, 0.282, 0.600); // #ec4899
+
+      float a1 = smoothstep(0.35, 0.95, f1 + mouseGlow);
+      float a2 = smoothstep(0.40, 0.90, f2);
+      float a3 = smoothstep(0.50, 0.98, f3);
+
+      vec3 col = vec3(0.0);
+      col += c1 * a1 * 0.55;
+      col += c2 * a2 * 0.35;
+      col += c3 * a3 * 0.22;
+      col *= 1.0 + mouseGlow * 1.4;
+
+      // Vignette
+      float vig = smoothstep(1.1, 0.35, length(p));
+      col *= vig;
+
+      // Fade naar void aan randen
+      float edge = smoothstep(0.0, 0.6, uv.x) * smoothstep(1.0, 0.4, uv.x)
+                 * smoothstep(0.0, 0.6, uv.y) * smoothstep(1.0, 0.4, uv.y);
+      col *= edge;
+
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `;
+
+  function compile(type, src){
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s);
+    if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)){
+      console.warn('[LinkVault] Shader compile error:', gl.getShaderInfoLog(s));
+      return null;
+    }
+    return s;
+  }
+
+  const v = compile(gl.VERTEX_SHADER, vs);
+  const f = compile(gl.FRAGMENT_SHADER, fs);
+  if(!v || !f) return;
+
+  const prog = gl.createProgram();
+  gl.attachShader(prog, v); gl.attachShader(prog, f); gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){
+    console.warn('[LinkVault] Program link error');
+    return;
+  }
+  gl.useProgram(prog);
+
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, 'p');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+  const uRes = gl.getUniformLocation(prog, 'u_res');
+  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+  const uTime = gl.getUniformLocation(prog, 'u_time');
+
+  let mx = 0, my = 0, tx = 0, ty = 0;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function resize(){
+    const w = window.innerWidth, h = window.innerHeight;
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.uniform2f(uRes, canvas.width, canvas.height);
+    tx = mx = canvas.width / 2;
+    ty = my = canvas.height / 2;
+  }
+  resize();
+  window.addEventListener('resize', resize, {passive:true});
+
+  window.addEventListener('mousemove', function(e){
+    tx = e.clientX * dpr;
+    ty = (window.innerHeight - e.clientY) * dpr; // flip Y voor WebGL
+  }, {passive:true});
+
+  window.addEventListener('touchmove', function(e){
+    if(e.touches[0]){ tx = e.touches[0].clientX * dpr; ty = (window.innerHeight - e.touches[0].clientY) * dpr; }
+  }, {passive:true});
+
+  let start = performance.now();
+  let running = true;
+  document.addEventListener('visibilitychange', () => { running = !document.hidden; });
+
+  function frame(now){
+    if(running){
+      // Smooth mouse follow
+      mx += (tx - mx) * 0.06;
+      my += (ty - my) * 0.06;
+      gl.uniform2f(uMouse, mx, my);
+      gl.uniform1f(uTime, (now - start) / 1000);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  canvas.classList.add('ready');
+  console.log('[LinkVault] Aurora shader actief');
+})();
+
+/* ═══ SCROLL REVEAL ═══ */
+let revealObserver = null;
+function observeReveals(){
+  if(!('IntersectionObserver' in window)){ $$('.reveal').forEach(el=>el.classList.add('in-view')); return; }
+  if(revealObserver) revealObserver.disconnect();
+  revealObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){ en.target.classList.add('in-view'); revealObserver.unobserve(en.target); }
+    });
+  }, {threshold:0.12, rootMargin:'0px 0px -40px 0px'});
+  $$('.reveal').forEach(function(el){ revealObserver.observe(el); });
+}
+
+/* ═══ RENDER ═══ */
+function renderProfile(){
+  if(!state) return;
+  const p = state.profile;
+  const av = $('#avatar');
+  if(p.avatar) av.innerHTML = '<img src="' + esc(p.avatar) + '" alt="Profielfoto van ' + esc(p.name) + '">';
+  else av.textContent = initialsFrom(p.name);
+  $('#nameText').textContent = p.name || 'Naamloos';
+  $('#verifiedBadge').hidden = !p.verified;
+  $('#handleText').textContent = p.handle || '';
+  $('#bioText').textContent = p.bio || '';
+  $('#statusDot').hidden = !p.status;
+  $('#footerName').textContent = p.name || '';
+  $('#footerYear').textContent = new Date().getFullYear();
+  document.title = (p.name || 'Mijn Links') + ' — LinkVault';
+}
+function renderSocials(){
+  if(!state) return;
+  $('#socials').innerHTML = state.socials.filter(s=>s.url).map(s=>
+    '<a class="social" href="' + esc(normalizeUrl(s.url)) + '" target="_blank" rel="noopener noreferrer" aria-label="' + esc(s.icon) + ' profiel">' + iconSVG(s.icon) + '</a>'
+  ).join('');
+}
+function renderLinks(){
+  if(!state) return;
+  const wrap = $('#links');
+  const list = state.links;
+  if(!list.length){
+    wrap.innerHTML = '<div style="text-align:center;padding:28px;color:var(--text-3);font-size:13px;border:1px dashed var(--keyline);border-radius:var(--r-sm)">Nog geen links.</div>';
+    return;
+  }
+  wrap.innerHTML = list.map(function(l,i){
+    return '<a class="link-card reveal" style="transition-delay:' + (0.08 * i) + 's" href="' + esc(normalizeUrl(l.url)) + '" target="_blank" rel="noopener noreferrer">' +
+      '<span class="link-icon">' + iconSVG(l.icon) + '</span>' +
+      '<span class="link-text"><strong>' + esc(l.title || 'Naamloos') + '</strong>' + (l.subtitle ? '<small>' + esc(l.subtitle) + '</small>' : '') + '</span>' +
+      '<svg class="link-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>' +
+    '</a>';
+  }).join('');
+  observeReveals();
+}
+function renderPublic(){ renderProfile(); renderSocials(); renderLinks(); }
+
+/* ═══ EDITOR RENDER ═══ */
+const openItems = new Set();
+function iconGrid(current){
+  return '<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:5px;max-height:118px;overflow-y:auto;padding:4px;background:var(--surface-2);border:1px solid var(--keyline);border-radius:var(--r-sm)">' +
+    ICON_KEYS.map(function(k){
+      const active = k === current;
+      return '<button type="button" class="icon-opt" data-icon="' + k + '" title="' + k + '" aria-label="Icoon ' + k + '" style="aspect-ratio:1;display:grid;place-items:center;border-radius:3px;color:' + (active?'#fff':'var(--text-3)') + ';background:' + (active?'var(--violet)':'transparent') + ';transition:.2s">' + iconSVG(k) + '</button>';
+    }).join('') + '</div>';
+}
+function linkRow(l,i,total){
+  const open = openItems.has(l.id);
+  return '<div class="ed-item" data-id="' + l.id + '" data-type="link" style="border:1px solid var(--keyline);border-radius:var(--r-sm);background:var(--surface-2);overflow:hidden">' +
+    '<div data-toggle style="display:flex;align-items:center;gap:10px;padding:12px;cursor:pointer;user-select:none">' +
+      '<span style="width:32px;height:32px;flex-shrink:0;display:grid;place-items:center;border-radius:3px;background:var(--violet-soft);color:var(--violet)">' + iconSVG(l.icon) + '</span>' +
+      '<span style="flex:1;min-width:0;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-0.01em">' + esc(l.title||'Naamloos') + (l.subtitle?' <em style="font-style:normal;color:var(--text-3);font-weight:400">· ' + esc(l.subtitle) + '</em>':'') + '</span>' +
+      '<button type="button" data-act="up" ' + (i===0?'disabled':'') + ' title="Omhoog" aria-label="Omhoog" style="width:26px;height:26px;display:grid;place-items:center;border-radius:3px;color:var(--text-3);opacity:' + (i===0?.25:1) + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M18 15l-6-6-6 6"/></svg></button>' +
+      '<button type="button" data-act="down" ' + (i===total-1?'disabled':'') + ' title="Omlaag" aria-label="Omlaag" style="width:26px;height:26px;display:grid;place-items:center;border-radius:3px;color:var(--text-3);opacity:' + (i===total-1?.25:1) + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M6 9l6 6 6-6"/></svg></button>' +
+      '<button type="button" data-act="del" title="Verwijderen" aria-label="Verwijderen" style="width:26px;height:26px;display:grid;place-items:center;border-radius:3px;color:var(--text-3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg></button>' +
+      '<button type="button" data-act="toggle" title="Uitklappen" aria-label="Uitklappen" style="width:26px;height:26px;display:grid;place-items:center;border-radius:3px;color:var(--text-3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;transform:rotate(' + (open?180:0) + 'deg);transition:transform .35s"><path d="M6 9l6 6 6-6"/></svg></button>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-rows:' + (open?'1fr':'0fr') + ';transition:grid-template-rows .38s cubic-bezier(.22,1,.36,1)"><div style="overflow:hidden"><div style="padding:14px 12px;border-top:1px solid var(--keyline)">' +
+      '<div class="field"><label>Icoon</label>' + iconGrid(l.icon) + '</div>' +
+      '<div class="field"><label>Titel</label><input class="input" data-field="title" value="' + esc(l.title) + '" maxlength="40" placeholder="Titel"></div>' +
+      '<div class="field"><label>Ondertitel</label><input class="input" data-field="subtitle" value="' + esc(l.subtitle||'') + '" maxlength="50" placeholder="Optioneel"></div>' +
+      '<div class="field" style="margin-bottom:0"><label>URL</label><input class="input" data-field="url" value="' + esc(l.url) + '" placeholder="https://…" inputmode="url"></div>' +
+    '</div></div></div>' +
+  '</div>';
+}
+function socialRow(s,i,total){
+  const open = openItems.has(s.id);
+  return '<div class="ed-item" data-id="' + s.id + '" data-type="social" style="border:1px solid var(--keyline);border-radius:var(--r-sm);background:var(--surface-2);overflow:hidden">' +
+    '<div data-toggle style="display:flex;align-items:center;gap:10px;padding:12px;cursor:pointer;user-select:none">' +
+      '<span style="width:32px;height:32px;flex-shrink:0;display:grid;place-items:center;border-radius:3px;background:var(--violet-soft);color:var(--violet)">' + iconSVG(s.icon) + '</span>' +
+      '<span style="flex:1;min-width:0;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-0.01em">' + esc(s.icon) + ' <em style="font-style:normal;color:var(--text-3);font-weight:400">· ' + esc(prettyUrl(s.url)||'geen url') + '</em></span>' +
+      '<button type="button" data-act="up" ' + (i===0?'disabled':'') + ' title="Omhoog" aria-label="Omhoog" style="width:26px;height:26px;display:grid;place-items:center;border-radius:3px;color:var(--text-3);opacity:' + (i===0?.25:1) + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M18 15l-6-6-6 6"/></svg></button>' +
+      '<button type="button" data-act="down" ' + (i===total-1?'disabled':'') + ' title="Omlaag" aria-label="Omlaag" style="width:26px;height:26px;display:grid;place-items:center;border-radius:3px;color:var(--text-3);opacity:' + (i===total-1?.25:1) + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M6 9l6 6 6-6"/></svg></button>' +
+      '<button type="button" data-act="del" title="Verwijderen" aria-label="Verwijderen" style="width:26px;height:26px;display:grid;place-items:center;border-radius:3px;color:var(--text-3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg></button>' +
+      '<button type="button" data-act="toggle" title="Uitklappen" aria-label="Uitklappen" style="width:26px;height:26px;display:grid;place-items:center;border-radius:3px;color:var(--text-3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;transform:rotate(' + (open?180:0) + 'deg);transition:transform .35s"><path d="M6 9l6 6 6-6"/></svg></button>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-rows:' + (open?'1fr':'0fr') + ';transition:grid-template-rows .38s cubic-bezier(.22,1,.36,1)"><div style="overflow:hidden"><div style="padding:14px 12px;border-top:1px solid var(--keyline)">' +
+      '<div class="field"><label>Platform</label>' + iconGrid(s.icon) + '</div>' +
+      '<div class="field" style="margin-bottom:0"><label>URL</label><input class="input" data-field="url" value="' + esc(s.url) + '" placeholder="https://…" inputmode="url"></div>' +
+    '</div></div></div>' +
+  '</div>';
+}
+function renderEditorLinks(){
+  const wrap = $('#edLinks');
+  wrap.innerHTML = state.links.length
+    ? state.links.map((l,i)=>linkRow(l,i,state.links.length)).join('')
+    : '<div style="text-align:center;padding:24px;color:var(--text-3);font-size:12px;border:1px dashed var(--keyline);border-radius:var(--r-sm)">Nog geen links.</div>';
+  $('#linkCount').textContent = state.links.length;
+}
+function renderEditorSocials(){
+  const wrap = $('#edSocials');
+  wrap.innerHTML = state.socials.length
+    ? state.socials.map((s,i)=>socialRow(s,i,state.socials.length)).join('')
+    : '<div style="text-align:center;padding:24px;color:var(--text-3);font-size:12px;border:1px dashed var(--keyline);border-radius:var(--r-sm)">Nog geen socials.</div>';
+  $('#socialCount').textContent = state.socials.length;
+}
+const ACCENTS = ['#7c5cfc','#8b5cf6','#d946ef','#ec4899','#ef4444','#f59e0b','#10b981','#06b6d4','#3b82f6','#64748b'];
+function setSwitch(id, on){
+  const el = $('#'+id); if(!el) return;
+  el.setAttribute('aria-checked', String(on));
+  el.style.background = on ? 'var(--violet)' : 'var(--surface-3)';
+  el.style.borderColor = on ? 'var(--violet)' : 'var(--keyline)';
+  const knob = el.querySelector('span');
+  if(knob){
+    knob.style.transform = on ? 'translateX(20px)' : 'translateX(0)';
+    knob.style.background = on ? '#fff' : 'var(--text-3)';
+  }
+}
+function renderSwatches(){
+  $('#swatches').innerHTML = ACCENTS.map(function(c){
+    const active = c === state.appearance.accent;
+    return '<button type="button" class="swatch" data-color="' + c + '" title="' + c + '" aria-label="Kleur ' + c + '" style="width:32px;height:32px;border-radius:50%;background:' + c + ';box-shadow:' + (active?'0 0 0 2px var(--void),0 0 0 4px var(--text)':'inset 0 0 0 1px rgba(255,255,255,.12)') + ';transition:transform .3s;cursor:pointer"></button>';
+  }).join('') +
+  '<label style="position:relative;width:32px;height:32px;border-radius:50%;overflow:hidden;border:1px dashed var(--keyline);display:grid;place-items:center;color:var(--text-3);cursor:pointer" title="Eigen kleur" aria-label="Eigen kleur kiezen">' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;pointer-events:none"><path d="M12 5v14M5 12h14"/></svg>' +
+    '<input type="color" id="customColor" value="' + esc(state.appearance.accent) + '" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">' +
+  '</label>';
+}
+function renderEditorFields(){
+  if(!state) return;
+  $('#edName').value   = state.profile.name;
+  $('#edHandle').value = state.profile.handle;
+  $('#edBio').value    = state.profile.bio;
+  $('#edBioCount').textContent = state.profile.bio.length;
+  const prev = $('#edAvatarPreview');
+  if(state.profile.avatar) prev.innerHTML = '<img src="' + esc(state.profile.avatar) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+  else prev.textContent = initialsFrom(state.profile.name);
+  setSwitch('tgVerified', state.profile.verified);
+  setSwitch('tgStatus', state.profile.status);
+  $$('#modeSwitch button').forEach(function(b){
+    const active = b.dataset.mode === state.appearance.mode;
+    b.style.background = active ? 'var(--surface-1)' : 'transparent';
+    b.style.color = active ? 'var(--text)' : 'var(--text-2)';
+    b.style.boxShadow = active ? '0 1px 2px rgba(0,0,0,.3)' : 'none';
+  });
+  renderSwatches();
+}
+
+/* ═══ VAULT SAVE / LOCK ═══ */
+async function saveVault(){
+  if(!state || !vaultPw) return;
+  const el = $('#saveState');
+  const persistent = SafeStorage.isPersistent();
+  if(el){
+    el.style.color = 'var(--warn)';
+    el.innerHTML = '<span style="width:5px;height:5px;border-radius:50%;background:var(--warn);display:inline-block"></span> Opslaan…';
+  }
+  try{
+    const payload = await VaultCrypto.encrypt(state, vaultPw);
+    SafeStorage.setItem(KEY_VAULT, JSON.stringify(payload));
+    if(el){
+      el.style.color = persistent ? 'var(--text-3)' : 'var(--warn)';
+      el.innerHTML = '<span style="width:5px;height:5px;border-radius:50%;background:' + (persistent ? 'var(--success)' : 'var(--warn)') + ';display:inline-block"></span> ' + (persistent ? 'Opgeslagen' : 'Sessie-opslag');
+    }
+  }catch(e){
+    console.error('[LinkVault] Opslaan mislukt:', e);
+    if(el){ el.style.color = 'var(--danger)'; el.textContent = 'Opslaan mislukt'; }
+  }
+}
+function lockVault(){
+  state = null; vaultPw = null;
+  clearTimeout(lockTimer);
+  showView('viewWelcome');
+  renderVaultList();
+  const cf = $('#createForm'), of = $('#openForm');
+  if(cf) cf.style.display = 'none';
+  if(of) of.style.display = 'none';
+  toast('Vault vergrendeld');
+}
+function resetLockTimer(){
+  clearTimeout(lockTimer);
+  lockTimer = setTimeout(function(){ if(vaultPw) lockVault(); }, LOCK_TIMEOUT);
+}
+function renderVaultList(){
+  const raw = SafeStorage.getItem(KEY_VAULT);
+  const wrap = $('#vaultList');
+  if(!raw){ wrap.style.display = 'none'; return; }
+  try{ JSON.parse(raw); }catch(e){ wrap.style.display='none'; return; }
+  wrap.style.display = 'block';
+  wrap.innerHTML = '<div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--keyline)"><p style="font-size:12.5px;color:var(--text-2);line-height:1.7;margin-bottom:0;letter-spacing:-0.006em"><strong style="color:var(--text)">Er bestaat al een vault op dit apparaat.</strong><br>Klik op "Bestaande vault" om te ontgrendelen met je wachtwoord.</p></div>';
+}
+
+/* ═══ FORM ERROR ═══ */
+function showFormError(elId, msg){
+  const el = $('#' + elId);
+  if(!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = '';
+  toast(msg);
+  console.warn('[LinkVault] Form error:', msg);
+}
+function hideFormError(elId){
+  const el = $('#' + elId);
+  if(el) el.classList.remove('show');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   WELCOME ACTIES
+   ═══════════════════════════════════════════════════════════════ */
+$('#btnCreate').addEventListener('click', function(){
+  $('#createForm').style.display = 'block';
+  $('#openForm').style.display = 'none';
+  $('#vaultList').style.display = 'none';
+  hideFormError('createError');
+  setTimeout(function(){ $('#newName').focus(); }, 100);
+});
+$('#btnOpen').addEventListener('click', function(){
+  const raw = SafeStorage.getItem(KEY_VAULT);
+  if(!raw){ toast('Geen vault gevonden op dit apparaat'); return; }
+  $('#openForm').style.display = 'block';
+  $('#createForm').style.display = 'none';
+  $('#vaultList').style.display = 'none';
+  hideFormError('openError');
+  setTimeout(function(){ $('#openPw').focus(); }, 100);
+});
+$('#cancelCreate').addEventListener('click', function(){
+  $('#createForm').style.display = 'none';
+  hideFormError('createError');
+  renderVaultList();
+});
+$('#cancelOpen').addEventListener('click', function(){
+  $('#openForm').style.display = 'none';
+  hideFormError('openError');
+  renderVaultList();
+});
+$('#newPw').addEventListener('input', function(e){
+  const v = e.target.value;
+  let score = 0;
+  if(v.length >= 8) score++;
+  if(v.length >= 12) score++;
+  if(/[A-Z]/.test(v) && /[a-z]/.test(v)) score++;
+  if(/\d/.test(v) || /[^A-Za-z0-9]/.test(v)) score++;
+  $$('#pwStrength span').forEach(function(s,i){
+    s.className = '';
+    if(i < score) s.classList.add(score <= 2 ? 'weak' : score === 3 ? 'med' : 'on');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   VAULT AANMAKEN
+   ═══════════════════════════════════════════════════════════════ */
+$('#btnCreateSubmit').addEventListener('click', async function(){
+  hideFormError('createError');
+  const name = $('#newName').value.trim();
+  const pw1  = $('#newPw').value;
+  const pw2  = $('#newPw2').value;
+  const consent = $('#consentCheck').checked;
+
+  if(!name){ showFormError('createError', 'Vul je naam in.'); $('#newName').focus(); return; }
+  if(pw1.length < 8){ showFormError('createError', 'Wachtwoord moet minimaal 8 tekens zijn.'); $('#newPw').focus(); return; }
+  if(pw1 !== pw2){ showFormError('createError', 'Wachtwoorden komen niet overeen.'); $('#newPw2').focus(); return; }
+  if(!consent){ showFormError('createError', 'Je moet akkoord gaan met de voorwaarden.'); return; }
+  if(!VaultCrypto.available()){
+    showFormError('createError', 'Encryptie niet beschikbaar. Open via http://localhost of https://. Klik rechtsboven op Diagnose.');
+    return;
+  }
+
+  const btn = $('#btnCreateSubmit');
+  const originalHTML = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg> Bezig met versleutelen…';
+
+  try{
+    const data = defaultData();
+    data.profile.name = name;
+    const payload = await VaultCrypto.encrypt(data, pw1);
+    SafeStorage.setItem(KEY_VAULT, JSON.stringify(payload));
+
+    state = data;
+    vaultPw = pw1;
+
+    applyTheme();
+    renderPublic();
+    renderEditorFields();
+    renderEditorLinks();
+    renderEditorSocials();
+    showView('viewProfile');
+    resetLockTimer();
+
+    toast(SafeStorage.isPersistent() ? 'Vault aangemaakt en versleuteld ✓' : 'Vault aangemaakt (tijdelijk — alleen deze sessie)');
+
+    btn.innerHTML = originalHTML;
+    btn.disabled = false;
+    $('#newName').value = '';
+    $('#newPw').value = '';
+    $('#newPw2').value = '';
+    $('#consentCheck').checked = false;
+    $$('#pwStrength span').forEach(function(s){ s.className = ''; });
+    $('#createForm').style.display = 'none';
+  }catch(err){
+    console.error('[LinkVault] CREATE ERROR:', err);
+    showFormError('createError', 'Fout: ' + (err && err.message ? err.message : 'onbekend') + '. Zie console.');
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   VAULT OPENEN
+   ═══════════════════════════════════════════════════════════════ */
+$('#btnOpenSubmit').addEventListener('click', async function(){
+  hideFormError('openError');
+  const pw = $('#openPw').value;
+  if(!pw){ showFormError('openError', 'Voer je wachtwoord in.'); return; }
+  if(!VaultCrypto.available()){
+    showFormError('openError', 'Encryptie niet beschikbaar. Open via http://localhost of https://.');
+    return;
+  }
+  const raw = SafeStorage.getItem(KEY_VAULT);
+  if(!raw){ showFormError('openError', 'Geen vault gevonden.'); return; }
+
+  const btn = $('#btnOpenSubmit');
+  const originalHTML = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg> Ontgrendelen…';
+
+  try{
+    const payload = JSON.parse(raw);
+    const data = await VaultCrypto.decrypt(payload, pw);
+    state = data;
+    vaultPw = pw;
+    applyTheme();
+    renderPublic();
+    renderEditorFields();
+    renderEditorLinks();
+    renderEditorSocials();
+    showView('viewProfile');
+    resetLockTimer();
+    toast('Vault ontgrendeld ✓');
+    $('#openPw').value = '';
+    $('#openForm').style.display = 'none';
+  }catch(err){
+    console.error('[LinkVault] OPEN ERROR:', err);
+    showFormError('openError', 'Onjuist wachtwoord of beschadigde vault.');
+    $('#openPw').value = '';
+    $('#openPw').focus();
+  }finally{
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
+  }
+});
+
+/* ═══ PROFIEL ACTIES ═══ */
+$('#btnLock').addEventListener('click', lockVault);
+$('#btnLockEditor').addEventListener('click', lockVault);
+$('#btnEdit').addEventListener('click', function(){ showView('viewEditor'); resetLockTimer(); });
+$('#btnBackToProfile').addEventListener('click', function(){ showView('viewProfile'); resetLockTimer(); });
+
+$('#btnShareProfile').addEventListener('click', async function(){
+  const data = { title: document.title, url: location.href };
+  try{
+    if(navigator.share){ await navigator.share(data); }
+    else{ await navigator.clipboard.writeText(location.href); toast('Link gekopieerd'); }
+  }catch(err){
+    if(err.name !== 'AbortError'){
+      try{ await navigator.clipboard.writeText(location.href); toast('Link gekopieerd'); }
+      catch(e){ toast('Delen mislukt'); }
+    }
+  }
+});
+
+['#themeToggleWelcome','#themeToggleProfile'].forEach(function(sel){
+  const el = $(sel); if(!el) return;
+  el.addEventListener('click', function(){
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    SafeStorage.setItem(KEY_THEME, next);
+    if(state){ state.appearance.mode = next; saveVault(); }
+    if($('#viewEditor').classList.contains('active')) renderEditorFields();
+    applyTheme();
+  });
+});
+
+/* ═══ EDITOR VELDEN ═══ */
+function bindField(sel, path){
+  $(sel).addEventListener('input', function(e){
+    if(!state) return;
+    const keys = path.split('.');
+    let obj = state;
+    for(let i=0;i<keys.length-1;i++) obj = obj[keys[i]];
+    obj[keys[keys.length-1]] = e.target.value;
+    if(path === 'profile.bio') $('#edBioCount').textContent = e.target.value.length;
+    if(path === 'profile.name' && !state.profile.avatar){
+      $('#edAvatarPreview').textContent = initialsFrom(e.target.value);
+    }
+    renderProfile();
+    resetLockTimer();
+    saveVault();
+  });
+}
+bindField('#edName','profile.name');
+bindField('#edHandle','profile.handle');
+bindField('#edBio','profile.bio');
+
+$('#tgVerified').addEventListener('click', function(){
+  if(!state) return;
+  state.profile.verified = !state.profile.verified;
+  setSwitch('tgVerified', state.profile.verified);
+  renderProfile(); resetLockTimer(); saveVault();
+});
+$('#tgStatus').addEventListener('click', function(){
+  if(!state) return;
+  state.profile.status = !state.profile.status;
+  setSwitch('tgStatus', state.profile.status);
+  renderProfile(); resetLockTimer(); saveVault();
+});
+
+$('#btnUploadAvatar').addEventListener('click', function(){ $('#avatarFile').click(); });
+$('#avatarFile').addEventListener('change', function(e){
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  if(file.size > 3*1024*1024){ toast('Max 3 MB'); return; }
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    state.profile.avatar = ev.target.result;
+    renderProfile(); renderEditorFields(); resetLockTimer(); saveVault();
+    toast('Foto bijgewerkt');
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+$('#btnRemoveAvatar').addEventListener('click', function(){
+  if(!state || !state.profile.avatar){ toast('Geen foto'); return; }
+  state.profile.avatar = null;
+  renderProfile(); renderEditorFields(); resetLockTimer(); saveVault();
+  toast('Foto verwijderd');
+});
+
+$('#modeSwitch').addEventListener('click', function(e){
+  const btn = e.target.closest('button[data-mode]');
+  if(!btn || !state) return;
+  state.appearance.mode = btn.dataset.mode;
+  applyTheme(); renderEditorFields(); resetLockTimer(); saveVault();
+});
+$('#swatches').addEventListener('click', function(e){
+  const sw = e.target.closest('.swatch');
+  if(!sw || !state) return;
+  state.appearance.accent = sw.dataset.color;
+  applyTheme(); renderSwatches(); resetLockTimer(); saveVault();
+});
+$('#swatches').addEventListener('input', function(e){
+  if(e.target.id !== 'customColor' || !state) return;
+  state.appearance.accent = e.target.value;
+  applyTheme(); resetLockTimer(); saveVault();
+});
+
+/* ═══ LIJSTEN ═══ */
+function getList(type){ return type === 'link' ? state.links : state.socials; }
+function handleListClick(e, type){
+  if(!state) return;
+  const item = e.target.closest('.ed-item');
+  if(!item) return;
+  const id  = item.dataset.id;
+  const list = getList(type);
+  const idx  = list.findIndex(function(x){ return x.id === id; });
+  if(idx < 0) return;
+
+  const iconBtn = e.target.closest('.icon-opt');
+  if(iconBtn){
+    list[idx].icon = iconBtn.dataset.icon;
+    renderPublic();
+    renderEditorLinks(); renderEditorSocials();
+    resetLockTimer(); saveVault();
+    return;
+  }
+  const act = (e.target.closest('[data-act]') && e.target.closest('[data-act]').dataset.act) || (e.target.closest('[data-toggle]') ? 'toggle' : null);
+  if(!act) return;
+  e.stopPropagation();
+
+  if(act === 'toggle'){
+    if(openItems.has(id)) openItems.delete(id); else openItems.add(id);
+    if(type === 'link') renderEditorLinks(); else renderEditorSocials();
+    return;
+  }
+  if(act === 'up' && idx > 0){ const t = list[idx-1]; list[idx-1] = list[idx]; list[idx] = t; }
+  if(act === 'down' && idx < list.length-1){ const t = list[idx+1]; list[idx+1] = list[idx]; list[idx] = t; }
+  if(act === 'del'){ list.splice(idx,1); openItems.delete(id); toast(type==='link'?'Link verwijderd':'Social verwijderd'); }
+
+  renderPublic();
+  renderEditorLinks(); renderEditorSocials();
+  resetLockTimer(); saveVault();
+}
+$('#edLinks').addEventListener('click', function(e){ handleListClick(e,'link'); });
+$('#edSocials').addEventListener('click', function(e){ handleListClick(e,'social'); });
+
+function handleListInput(e){
+  if(!state) return;
+  const input = e.target.closest('input[data-field]');
+  if(!input) return;
+  const item = input.closest('.ed-item');
+  const list = getList(item.dataset.type);
+  const obj  = list.find(function(x){ return x.id===item.dataset.id; });
+  if(!obj) return;
+  const field = input.dataset.field;
+  obj[field] = input.value;
+  if(item.dataset.type === 'link') renderLinks();
+  else renderSocials();
+  resetLockTimer(); saveVault();
+}
+$('#edLinks').addEventListener('input', handleListInput);
+$('#edSocials').addEventListener('input', handleListInput);
+
+function normalizeOnBlur(e){
+  if(!state) return;
+  const input = e.target.closest('input[data-field="url"]');
+  if(!input) return;
+  const item = input.closest('.ed-item');
+  const list = getList(item.dataset.type);
+  const obj = list.find(function(x){ return x.id===item.dataset.id; });
+  if(!obj || !obj.url) return;
+  const fixed = normalizeUrl(obj.url);
+  if(fixed !== obj.url){ obj.url = fixed; input.value = fixed; renderPublic(); saveVault(); }
+}
+$('#edLinks').addEventListener('blur', normalizeOnBlur, true);
+$('#edSocials').addEventListener('blur', normalizeOnBlur, true);
+
+$('#btnAddLink').addEventListener('click', function(){
+  if(!state) return;
+  const l = {id:uid(), icon:'link', title:'Nieuwe link', subtitle:'', url:'https://'};
+  state.links.push(l); openItems.add(l.id);
+  renderLinks(); renderEditorLinks(); saveVault();
+  requestAnimationFrame(function(){
+    const el = $('#edLinks .ed-item[data-id="' + l.id + '"]');
+    if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); const f = el.querySelector('input[data-field="title"]'); if(f) f.focus(); }
+  });
+});
+$('#btnAddSocial').addEventListener('click', function(){
+  if(!state) return;
+  const s = {id:uid(), icon:'instagram', url:'https://'};
+  state.socials.push(s); openItems.add(s.id);
+  renderSocials(); renderEditorSocials(); saveVault();
+  requestAnimationFrame(function(){
+    const el = $('#edSocials .ed-item[data-id="' + s.id + '"]');
+    if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); const f = el.querySelector('input[data-field="url"]'); if(f) f.focus(); }
+  });
+});
+
+/* ═══ IMPORT / EXPORT / DELETE ═══ */
+$('#btnExport').addEventListener('click', function(){
+  const raw = SafeStorage.getItem(KEY_VAULT);
+  if(!raw){ toast('Geen vault om te exporteren'); return; }
+  const blob = new Blob([raw], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = ((state && state.profile && state.profile.name ? state.profile.name : 'vault').toLowerCase().replace(/\s+/g,'-')) + '.vault';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Versleutelde back-up gedownload');
+});
+$('#btnImport').addEventListener('click', function(){ $('#importFile').click(); });
+$('#importFile').addEventListener('change', function(e){
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      const payload = JSON.parse(ev.target.result);
+      if(!payload.salt || !payload.iv || !payload.ct){ toast('Ongeldig bestand'); return; }
+      SafeStorage.setItem(KEY_VAULT, JSON.stringify(payload));
+      toast('Back-up geïmporteerd. Voer je wachtwoord in.');
+      lockVault();
+      setTimeout(function(){
+        $('#openForm').style.display = 'block';
+        $('#openPw').focus();
+      }, 300);
+    }catch(err){ toast('Ongeldig bestand'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+$('#btnDeleteVault').addEventListener('click', function(){
+  if(!confirm('Weet je zeker dat je je vault permanent wilt verwijderen? Dit kan niet ongedaan worden gemaakt. Maak eerst een back-up via Export.')) return;
+  SafeStorage.removeItem(KEY_VAULT);
+  state = null; vaultPw = null;
+  showView('viewWelcome');
+  renderVaultList();
+  toast('Vault verwijderd');
+});
+
+/* ═══ LEGAL ═══ */
+let previousView = 'viewWelcome';
+function openLegal(name){
+  const current = $$('.view').find(function(v){ return v.classList.contains('active'); });
+  if(current) previousView = current.id;
+  $$('.legal-page').forEach(function(p){ p.classList.remove('active'); });
+  const page = $('#legal-' + name);
+  if(page) page.classList.add('active');
+  $('#viewLegal').classList.add('active');
+  window.scrollTo({top:0, behavior:'auto'});
+}
+$('#legalBack').addEventListener('click', function(e){
+  e.preventDefault();
+  $('#viewLegal').classList.remove('active');
+  showView(previousView);
+});
+document.addEventListener('click', function(e){
+  const link = e.target.closest('[data-legal]');
+  if(!link) return;
+  e.preventDefault();
+  openLegal(link.dataset.legal);
+});
+
+/* ═══ COOKIE BANNER ═══ */
+function initCookies(){
+  if(SafeStorage.getItem(KEY_COOKIE)) return;
+  setTimeout(function(){ $('#cookieBanner').classList.add('show'); }, 1600);
+}
+$('#cookieAccept').addEventListener('click', function(){
+  SafeStorage.setItem(KEY_COOKIE, 'accepted');
+  $('#cookieBanner').classList.remove('show');
+});
+$('#cookieReject').addEventListener('click', function(){
+  SafeStorage.setItem(KEY_COOKIE, 'necessary');
+  $('#cookieBanner').classList.remove('show');
+});
+
+/* ═══ DIAGNOSE ═══ */
+function runDiagnose(){
+  const rows = [];
+  const ok = function(v){ return v ? '<span class="diag-ok">✓ ' + v + '</span>' : '<span class="diag-fail">✗ niet beschikbaar</span>'; };
+  const val = function(v){ return '<span>' + v + '</span>'; };
+
+  rows.push('<div class="diag-row"><span>Protocol</span>' + val(location.protocol) + '</div>');
+  rows.push('<div class="diag-row"><span>Host</span>' + val(location.hostname || 'leeg') + '</div>');
+  rows.push('<div class="diag-row"><span>window.crypto</span>' + ok(!!window.crypto) + '</div>');
+  rows.push('<div class="diag-row"><span>crypto.subtle</span>' + ok(!!(window.crypto && window.crypto.subtle)) + '</div>');
+  rows.push('<div class="diag-row"><span>WebGL</span>' + ok(!!document.createElement('canvas').getContext('webgl')) + '</div>');
+
+  let lsStatus = 'nee';
+  try{
+    const t = '__lv_diag__';
+    window.localStorage.setItem(t, '1');
+    window.localStorage.removeItem(t);
+    lsStatus = 'ja';
+  }catch(e){ lsStatus = 'geblokkeerd'; }
+  rows.push('<div class="diag-row"><span>localStorage</span>' + (lsStatus === 'ja' ? '<span class="diag-ok">✓ ja</span>' : '<span class="diag-fail">✗ ' + lsStatus + '</span>') + '</div>');
+  rows.push('<div class="diag-row"><span>Opslagmodus</span>' + (SafeStorage.isPersistent() ? '<span class="diag-ok">✓ persistent</span>' : '<span class="diag-fail">⚠ geheugen (tijdelijk)</span>') + '</div>');
+
+  let vaultExists = 'nee';
+  try{
+    const raw = SafeStorage.getItem(KEY_VAULT);
+    if(raw){ const p = JSON.parse(raw); vaultExists = 'ja (' + (p.ct ? p.ct.length : 0) + ' bytes)'; }
+  }catch(e){ vaultExists = 'beschadigd'; }
+  rows.push('<div class="diag-row"><span>Bestaande vault</span>' + val(vaultExists) + '</div>');
+
+  const canEncrypt = VaultCrypto.available();
+
+  rows.push('<div class="diag-row" style="border-top:1px solid var(--keyline);margin-top:8px;padding-top:12px"><span><strong>Kan versleutelen?</strong></span>' + (canEncrypt ? '<span class="diag-ok">✓ JA</span>' : '<span class="diag-fail">✗ NEE</span>') + '</div>');
+  rows.push('<div class="diag-row"><span><strong>Data permanent opgeslagen?</strong></span>' + (SafeStorage.isPersistent() ? '<span class="diag-ok">✓ JA</span>' : '<span class="diag-fail">⚠ NEE (sessie)</span>') + '</div>');
+
+  if(!canEncrypt){
+    rows.push('<div style="margin-top:16px;padding:14px;border-radius:var(--r-sm);background:rgba(229,165,10,.07);border:1px solid rgba(229,165,10,.25);color:#e5a50a;font-size:12.5px;line-height:1.6"><strong>Encryptie geblokkeerd.</strong><br>Open via <code>http://localhost</code> of <code>https://</code>. Upload je bestand naar <code>netlify.com/drop</code> voor een directe <code>https://</code>-link.</div>');
+  } else if(!SafeStorage.isPersistent()){
+    rows.push('<div style="margin-top:16px;padding:14px;border-radius:var(--r-sm);background:var(--violet-soft);border:1px solid var(--violet-line);color:var(--violet);font-size:12.5px;line-height:1.6"><strong>Je test in een sandbox.</strong><br>Encryptie werkt, maar gegevens worden <strong>niet permanent</strong> opgeslagen. Exporteer je vault als back-up, of open de pagina buiten de sandbox.</div>');
+  } else {
+    rows.push('<div style="margin-top:16px;padding:14px;border-radius:var(--r-sm);background:rgba(48,164,108,.07);border:1px solid rgba(48,164,108,.3);color:var(--success);font-size:12.5px;line-height:1.6"><strong>✓ Alles werkt!</strong><br>Versleuteling én permanente opslag zijn beschikbaar.</div>');
+  }
+
+  $('#diagContent').innerHTML = rows.join('');
+}
+$('#diagBtn').addEventListener('click', function(){
+  runDiagnose();
+  $('#diagModal').classList.add('show');
+});
+$('#diagClose').addEventListener('click', function(){
+  $('#diagModal').classList.remove('show');
+});
+$('#diagModal').addEventListener('click', function(e){
+  if(e.target === $('#diagModal')) $('#diagModal').classList.remove('show');
+});
+
+/* ═══ EXTERNE LINKS — sandbox fallback ═══ */
+document.addEventListener('click', function(e){
+  const link = e.target.closest('a[href]');
+  if(!link) return;
+  const href = link.getAttribute('href');
+  if(!href || href === '#' || /^(mailto:|tel:|javascript:)/i.test(href)) return;
+  if(!/^https?:\/\//i.test(href)) return;
+
+  let sandboxed = false;
+  if(window.self !== window.top){
+    try{ void window.top.location.href; }
+    catch(err){ sandboxed = true; }
+  }
+  if(sandboxed){
+    e.preventDefault();
+    const w = window.open(href, '_blank', 'noopener,noreferrer');
+    if(!w){
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(href)
+          .then(function(){ toast('Preview blokkeert links. URL gekopieerd ✓'); })
+          .catch(function(){ toast('Preview blokkeert links. Open de pagina los.'); });
+      }else{
+        toast('Preview blokkeert links. Open de pagina los.');
+      }
+    }
+  }
+}, true);
+
+/* ═══ INACTIVITEIT ═══ */
+['click','keydown','mousemove','touchstart','scroll'].forEach(function(evt){
+  document.addEventListener(evt, function(){ if(vaultPw) resetLockTimer(); }, {passive:true});
+});
+
+/* ═══ OMGEVING CHECK ═══ */
+function checkEnvironment(){
+  const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === '0.0.0.0';
+  if(!VaultCrypto.available() || !isSecure){
+    $('#cryptoWarning').classList.add('show');
+  }
+  if(!SafeStorage.isPersistent()){
+    $('#storageWarning').classList.add('show');
+  }
+}
+
+/* ═══ INIT ═══ */
+(function init(){
+  console.log('[LinkVault] Init — persistent:', SafeStorage.isPersistent(), '— crypto:', VaultCrypto.available());
+  applyTheme();
+  renderVaultList();
+  initCookies();
+  checkEnvironment();
+  observeReveals();
+  console.log('[LinkVault] Klaar.');
+})();
+
+</script>
+</body>
+</html>
